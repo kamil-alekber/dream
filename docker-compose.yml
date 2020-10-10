@@ -1,12 +1,12 @@
 version: '3.1'
 
 services:
-  dream-client:
+  dream-web:
     restart: always
     depends_on:
       - dream-server
     build:
-      context: client
+      context: services/web
     ports:
       - '3000:3000'
     volumes:
@@ -19,7 +19,7 @@ services:
     depends_on:
       - dream-db
     build:
-      context: server
+      context: services/server
     ports:
       - '4001:4001'
     volumes:
