@@ -1,8 +1,9 @@
 import {Router} from 'express';
 import {v4 as uuid4} from 'uuid';
 import bcrypt from 'bcrypt';
-import crypto  from 'crypto';
 import { User } from '../../models/User';
+import { loginValidation, registerValidation } from '../../helpers/validators';
+
 const router = Router();
 
 router
@@ -12,6 +13,16 @@ router
     })
     .post(async(req, res)=> {
         const {firstName, lastName, password, email } = req.body;
+        const username = `${firstName.trim()} ${lastName.trim()}`
+
+        const { error } = registerValidation({...req.body, username});
+        if (error) {
+          return res.status(400).json({
+            error: true,
+            message: error.details[0].message,
+            data: null,
+          });
+        }
         
         const salt = bcrypt.genSaltSync();
         const hashedPassword = bcrypt.hashSync(password, salt)
@@ -38,5 +49,49 @@ router
             data: newUser
         });
     });
+
+router.route('/login')
+    .get((req, res)=> {
+        return res.render('pages/user', {title: 'user'})
+    })
+    .post(async (req, res)=> {
+        const { error } = loginValidation(req.body);
+        if (error) {
+            return res.status(400).json({
+              error: true,
+              message: error.details[0].message,
+              data: null,
+            });
+        }
+
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Email is not registered",
+        data: null,
+      });
+    }
+
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.hashedPassword
+    );
+
+    if (!validPassword) {
+      return res.status(400).json({
+        error: true,
+        message: "Password is not valid",
+        data: null,
+      });
+    }
+
+    return {
+            error: false,
+            message: 'Success',
+            data: user
+        }
+})
 
 export {router as AuthRoutes};
