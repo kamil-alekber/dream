@@ -1,0 +1,29 @@
+{
+  "name": "@root/dream",
+  "version": "1.0.0",
+  "description": "Root package to connect other services [web, server, worker]",
+  "author": "Kamil Alekber",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "add:server": "yarn workspace @dream/server --use-yarnrc .yarnrc add",
+    "add:server:dev": "yarn workspace @dream/server --use-yarnrc .yarnrc add --dev",
+
+    "add:web": "yarn workspace @dream/web --use-yarnrc .yarnrc add",
+    "add:web:dev": "yarn workspace @dream/web --use-yarnrc .yarnrc add --dev",
+
+    "add:auth": "yarn workspace @dream/auth --use-yarnrc .yarnrc add",
+    "add:auth:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
+    
+    "dev": "yarn workspaces run dev",
+    "build": "yarn workspaces run build",
+    "test": "yarn workspaces run test",
+
+    "compose:up": "docker-compose up",
+    "compose:down": "docker-compose down",
+    "compose:prune": "docker-compose down -v --rmi local"
+  },
+  "workspaces": [
+   "services/*"
+  ]
+}

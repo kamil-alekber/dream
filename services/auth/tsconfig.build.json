@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "declaration": false
+  },
+  "exclude": ["node_modules", "**/__tests__", "**/__mocks__"],
+  "include": ["src/**/*"]
+}
