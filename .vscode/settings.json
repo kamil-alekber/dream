@@ -17,4 +17,7 @@
         "yarnrc"
     ],
     "editor.formatOnSave": true,
+    "material-icon-theme.folders.associations": {
+        "worker": "cluster",
+    },
 }
