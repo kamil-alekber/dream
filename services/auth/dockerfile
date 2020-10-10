@@ -1,0 +1,11 @@
+FROM node:12-alpine
+
+EXPOSE 5000
+
+WORKDIR /usr/src/app
+
+COPY . . 
+
+# RUN npm i && npm cache clean --force
+
+CMD [ "npm",  "run", "dev" ] 

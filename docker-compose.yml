@@ -1,0 +1,50 @@
+version: '3.1'
+
+services:
+  dream-client:
+    restart: always
+    depends_on:
+      - dream-server
+    build:
+      context: client
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./client/src:/usr/src/app/src
+    networks:
+      - client-server
+
+  dream-server:
+    restart: always
+    depends_on:
+      - dream-db
+    build:
+      context: server
+    ports:
+      - '4001:4001'
+    volumes:
+      - ./server/src:/usr/src/app/src
+    networks:
+      - server-db
+      - client-server
+
+  dream-db:
+    image: mongo:4.0-xenial
+    restart: always
+    ports:
+      - '27019:27019'
+    networks:
+      - server-db
+    volumes:
+      - dream-mongo:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: dream
+
+networks:
+  server-db:
+    driver: bridge
+  client-server:
+    driver: bridge
+
+volumes:
+  dream-mongo:

@@ -14,8 +14,9 @@
 
     "add:auth": "yarn workspace @dream/auth --use-yarnrc .yarnrc add",
     "add:auth:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
+    "dev": "yarn workspace @dream/auth run dev",
+
     
-    "dev": "yarn workspaces run dev",
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
 

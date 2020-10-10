@@ -5,7 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import path from "path";
 import { checkEnv } from "./helpers/checkEnv";
-
+import favicon from "serve-favicon";
 const app = express();
 checkEnv(app);
 
@@ -13,6 +13,7 @@ checkEnv(app);
 // Disable `powered-by` and add other protections
 // https://www.npmjs.com/package/helmet
 // app.use(favicon(path.join(__dirname, "public", "img", "favicon.ico")));
+app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
 app.set("views", path.resolve(__dirname, "public", "views"));
 app.set("view engine", "ejs");
 app.use(helmet());
