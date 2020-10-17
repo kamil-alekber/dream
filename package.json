@@ -6,18 +6,18 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "add:server": "yarn workspace @dream/server --use-yarnrc .yarnrc add",
-    "add:server:dev": "yarn workspace @dream/server --use-yarnrc .yarnrc add --dev",
+    "server:add": "yarn workspace @dream/server --use-yarnrc .yarnrc add",
+    "server:add:dev": "yarn workspace @dream/server --use-yarnrc .yarnrc add --dev",
 
-    "add:web": "yarn workspace @dream/web --use-yarnrc .yarnrc add",
-    "add:web:dev": "yarn workspace @dream/web --use-yarnrc .yarnrc add --dev",
-    "dev:web": "yarn workspace @dream/web run dev",
+    "web:add": "yarn workspace @dream/web --use-yarnrc .yarnrc add",
+    "web:add:dev": "yarn workspace @dream/web --use-yarnrc .yarnrc add --dev",
+    "web:dev": "yarn workspace @dream/web run dev",
+    "web:build": "yarn workspace @dream/web run build",
+    "web:start": "yarn workspace @dream/web run start",
 
-    "add:auth": "yarn workspace @dream/auth --use-yarnrc .yarnrc add",
-    "add:auth:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
-    "dev:auth": "yarn workspace @dream/auth run dev",
-
-
+    "auth:add": "yarn workspace @dream/auth --use-yarnrc .yarnrc add",
+    "auth:add:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
+    "auth:dev": "yarn workspace @dream/auth run dev",
 
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",

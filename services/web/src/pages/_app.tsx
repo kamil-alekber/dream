@@ -4,9 +4,10 @@ import '../styles/main.less';
 
 function app({ Component, pageProps }) {
   return (
-  <MainLayout>
-      <Component {...pageProps} />;
-  </MainLayout>); 
+    <MainLayout>
+      <Component {...pageProps} />
+    </MainLayout>
+  );
 }
 
 export default app;
