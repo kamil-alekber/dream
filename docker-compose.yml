@@ -2,9 +2,9 @@ version: '3.1'
 
 services:
   dream-web:
-    restart: always
     depends_on:
       - dream-server
+      - dream-auth
     build:
       context: services/web
     ports:
@@ -13,11 +13,12 @@ services:
       - ./client/src:/usr/src/app/src
     networks:
       - client-server
+      - server-auth
 
   dream-server:
-    restart: always
     depends_on:
       - dream-db
+      - dream-auth
     build:
       context: services/server
     ports:
@@ -27,6 +28,18 @@ services:
     networks:
       - server-db
       - client-server
+      - server-auth
+
+  dream-auth:
+    depends_on:
+      - dream-db
+    build:
+      context: services/auth
+    ports:
+      - '4001:4001'
+    networks:
+      - server-db
+      - web-server
 
   dream-db:
     image: mongo:4.0-xenial
@@ -43,7 +56,9 @@ services:
 networks:
   server-db:
     driver: bridge
-  client-server:
+  server-auth:
+    driver: bridge
+  web-server:
     driver: bridge
 
 volumes:

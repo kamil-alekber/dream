@@ -1,0 +1,29 @@
+@import '../styles/variables.less';
+
+#breadcrumb-panel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  .breadcrumb {
+    display: inline-block;
+    white-space: nowrap;
+    padding-bottom: 24px;
+    &__item {
+      color: @text-color-secondary;
+      &:last-child {
+        color: @text-color;
+      }
+      a {
+        color: @text-color-secondary;
+        &:hover {
+          color: @primary-color;
+        }
+      }
+    }
+    &-separator {
+      margin-left: 8px;
+      margin-right: 6px;
+      cursor: default;
+    }
+  }
+}

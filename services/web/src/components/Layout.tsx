@@ -1,69 +1,54 @@
+import { Layout, Menu, PageHeader, Button } from 'antd';
 import React from 'react';
-import { Layout, Menu } from 'antd';
-import {
-  AppstoreOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  ShopOutlined,
-  TeamOutlined,
-  UserOutlined,
-  UploadOutlined,
-  VideoCameraOutlined,
-} from '@ant-design/icons';
 import './Layout.less';
+import { AppMenu } from './Menu';
 
 export function MainLayout({ children }: any) {
   const { Header, Content, Footer, Sider } = Layout;
 
   return (
-    <Layout>
-      <Sider
+    <>
+      <PageHeader
         style={{
-          overflow: 'auto',
-          height: '100vh',
           position: 'fixed',
+          width: '100%',
+          background: '#fff',
+          top: 0,
           left: 0,
+          height: 65,
+          boxShadow: '0px 1px 5px -1px rgba(0,0,0,0.75)',
         }}
-      >
-        <div className="logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
-          <Menu.Item key="1" icon={<UserOutlined />}>
-            nav 1
-          </Menu.Item>
-          <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-            nav 2
-          </Menu.Item>
-          <Menu.Item key="3" icon={<UploadOutlined />}>
-            nav 3
-          </Menu.Item>
-          <Menu.Item key="4" icon={<BarChartOutlined />}>
-            nav 4
-          </Menu.Item>
-          <Menu.Item key="5" icon={<CloudOutlined />}>
-            nav 5
-          </Menu.Item>
-          <Menu.Item key="6" icon={<AppstoreOutlined />}>
-            nav 6
-          </Menu.Item>
-          <Menu.Item key="7" icon={<TeamOutlined />}>
-            nav 7
-          </Menu.Item>
-          <Menu.Item key="8" icon={<ShopOutlined />}>
-            nav 8
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout className="site-layout" style={{ marginLeft: 200, minHeight: '100vh' }}>
-        <Header className="site-layout-background" style={{ padding: 0 }} />
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
-            {children}
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          {new Date().getFullYear()}. Dream Web Client
-        </Footer>
+        extra={[
+          <Button key="1" type="primary">
+            Login
+          </Button>,
+          <Button key="2">Register</Button>,
+        ]}
+        title="Title"
+        subTitle="This is a subtitle"
+      />
+
+      <Layout style={{ marginTop: 65 }}>
+        <Sider
+          style={{
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+          }}
+        >
+          <AppMenu />
+        </Sider>
+        <Layout className="site-layout" style={{ marginLeft: 200, minHeight: '100vh' }}>
+          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+            <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
+              {children}
+            </div>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>
+            {new Date().getFullYear()}. Dream Web Client
+          </Footer>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 }
