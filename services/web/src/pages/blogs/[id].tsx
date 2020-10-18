@@ -4,6 +4,7 @@ import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } fro
 import fs from 'fs';
 import path from 'path';
 import { getSortedPostsData } from '../../lib/posts';
+import { Breadcrumb } from '../../components/Breadcrumb';
 
 export default function Blog({ post }) {
   const router = useRouter();
@@ -12,7 +13,13 @@ export default function Blog({ post }) {
     return <div>Loading...</div>;
   }
 
-  return <h1>{JSON.stringify(post, null, 2)}</h1>;
+  return (
+    <div>
+      <Breadcrumb title="Blogs" />
+      <Breadcrumb title={post?.title} />
+      <h1>{JSON.stringify(post, null, 2)}</h1>;
+    </div>
+  );
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {

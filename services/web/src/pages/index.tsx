@@ -1,27 +1,17 @@
-import React from 'react';
-import Link from 'next/link';
+import { Switch } from 'antd';
+import React, { useState } from 'react';
+import { Blog } from '../components/Blog/Blog';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { getSortedPostsData } from '../lib/posts';
 
 export default function index({ allPostsData }) {
+  const [loading, setLoading] = useState(false);
   return (
-    <ul style={{ listStyle: 'none' }}>
-      {allPostsData.map(({ id, date, title }, i) => (
-        <li key={id}>
-          <span>
-            {title}
-            <br />
-            {id}
-            <br />
-            {date}
-          </span>
-          <br />
-          <Link href="/blogs/[id]" as={`/blogs/${id}`}>
-            <a>Read more</a>
-          </Link>
-          <hr />
-        </li>
-      ))}
-    </ul>
+    <>
+      <Breadcrumb title="Articles" />
+      <Switch checked={!loading} onChange={() => setLoading(!loading)} />
+      <Blog loading={loading} posts={allPostsData} />
+    </>
   );
 }
 

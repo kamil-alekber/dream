@@ -12,6 +12,7 @@
     "antd": "4.7.0",
     "cookie-parser": "1.4.5",
     "dotenv": "8.2.0",
+    "eventemitter3": "4.0.7",
     "express": "4.17.1",
     "gray-matter": "4.0.2",
     "next": "9.5.5",

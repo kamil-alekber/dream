@@ -1,5 +1,6 @@
-import { Layout, Menu, PageHeader, Button } from 'antd';
+import { Layout, PageHeader, Button } from 'antd';
 import React from 'react';
+import { BreadcrumbPanel } from './Breadcrumb/BreadcrumbPanel';
 import './Layout.less';
 import { AppMenu } from './Menu';
 
@@ -10,6 +11,7 @@ export function MainLayout({ children }: any) {
     <>
       <PageHeader
         style={{
+          zIndex: 2,
           position: 'fixed',
           width: '100%',
           background: '#fff',
@@ -24,8 +26,7 @@ export function MainLayout({ children }: any) {
           </Button>,
           <Button key="2">Register</Button>,
         ]}
-        title="Title"
-        subTitle="This is a subtitle"
+        title={<BreadcrumbPanel />}
       />
 
       <Layout style={{ marginTop: 65 }}>
@@ -39,7 +40,7 @@ export function MainLayout({ children }: any) {
           <AppMenu />
         </Sider>
         <Layout className="site-layout" style={{ marginLeft: 200, minHeight: '100vh' }}>
-          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+          <Content style={{ margin: '24px 16px 0' }}>
             <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
               {children}
             </div>
