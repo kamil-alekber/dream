@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"kalekber/dream/services/docker/src/controller"
 	"log"
 	"net/http"
@@ -16,6 +17,8 @@ func main() {
 		Methods("POST")
 	r.HandleFunc("/profile", controller.ProfileHandler).
 		Methods("GET")
+
+	fmt.Println("Running web server on port 8080")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
