@@ -1,3 +1,4 @@
 $ go get "github.com/gorilla/mux"
 $ go get "github.com/mongodb/mongo-go-driver/mongo"
-$ go get "github.com/dgrijalva/jwt-go"
+$ go get "go.mongodb.org/mongo-driver/mongo"
+$ go get "github.com/docker/docker"

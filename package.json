@@ -1,7 +1,7 @@
 {
   "name": "@root/dream",
   "version": "1.0.0",
-  "description": "Root package to connect other services [web, server, worker]",
+  "description": "Root package to connect other services [web, server, worker, auth, docker]",
   "author": "Kamil Alekber",
   "license": "MIT",
   "private": true,
@@ -19,9 +19,12 @@
     "auth:add:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
     "auth:dev": "yarn workspace @dream/auth run dev",
 
+    "docker:dev": "$GOPATH/bin/modd --bell --notify --debug --file ./services/docker/modd.conf",
+
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
-
+    "dev": "yarn workspaces run dev",
+    
     "compose:up": "docker-compose up",
     "compose:down": "docker-compose down",
     "compose:prune": "docker-compose down -v --rmi local"
