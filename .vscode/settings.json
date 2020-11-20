@@ -1,23 +1,27 @@
 {
-    "cSpell.words": [
-        "add",
-        "alekber",
-        "dev",
-        "dream",
-        "express",
-        "kamil",
-        "kamil alekber",
-        "server",
-        "typegoose",
-        "types",
-        "use",
-        "workspace",
-        "yarn",
-        "yarn workspace dream server use yarnrc add dev types express",
-        "yarnrc"
-    ],
-    "editor.formatOnSave": true,
-    "material-icon-theme.folders.associations": {
-        "worker": "cluster",
-    },
+  "cSpell.words": [
+    "add",
+    "alekber",
+    "dev",
+    "dream",
+    "express",
+    "kamil",
+    "kamil alekber",
+    "server",
+    "typegoose",
+    "types",
+    "use",
+    "workspace",
+    "yarn",
+    "yarn workspace dream server use yarnrc add dev types express",
+    "yarnrc"
+  ],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "material-icon-theme.folders.associations": {
+    "worker": "cluster"
+  }
 }
