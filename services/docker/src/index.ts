@@ -2,6 +2,23 @@ import { ENV } from './env';
 import express from 'express';
 import Docker from 'dockerode';
 import path from 'path';
+import { Containers } from './models/containers';
+import { mongoose } from '@typegoose/typegoose';
+import { v4 as uuid4 } from 'uuid';
+
+(async () => {
+  try {
+    await mongoose.connect(ENV.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    });
+    console.warn('\x1b[32m%s\x1b[0m', '[+] 🏡 Connected to mongo on:', ENV.MONGO_URI);
+  } catch (error) {
+    console.error({ error });
+  }
+})();
 
 const app = express();
 
@@ -44,24 +61,32 @@ async function createImage() {
 async function createContainer() {
   const imageName = await createImage();
 
-  const container = await docker.createContainer({
-    Image: imageName,
-    name: `docker-test-${+new Date()}`,
-    AttachStdin: false,
-    AttachStdout: true,
-    AttachStderr: true,
-    Tty: true,
-    OpenStdin: false,
-    StdinOnce: false,
-  });
+  let container;
+  let existingContainer = await Containers.findOne({}, 'containerId');
+  console.log('found containers', { existingContainer });
+  if (!existingContainer?.containerId) {
+    container = await docker.createContainer({
+      Image: imageName,
+      name: `docker-test-${+new Date()}`,
+      AttachStdin: false,
+      AttachStdout: true,
+      AttachStderr: true,
+      Tty: true,
+      OpenStdin: false,
+      StdinOnce: false,
+    });
 
+    await Containers.create({ containerId: container.id, userId: uuid4() });
+  }
+
+  container = container ?? docker.getContainer(existingContainer?.containerId!);
+  await container.start();
   return container;
 }
 
 app.get('/', (req, res) => res.status(200).json({ error: false, data: true, message: null }));
 app.get('/run', async (req, res) => {
   const container = await createContainer();
-  await container.start();
 
   const logs = await container.logs({
     follow: true,
@@ -71,10 +96,15 @@ app.get('/run', async (req, res) => {
     tail: 50,
     timestamps: true,
   });
+  console.log(logs.pipe);
   logs.pipe(res);
-  container.wait().then(() => container.remove());
+  // container.wait().then(() => container.remove());
 });
 
 app.listen(ENV.PORT, () => {
-  console.log('\x1b[32m%s\x1b[0m', '[+] 🚀 Sever is listening on:', `http://localhost:${ENV.PORT}`);
+  console.warn(
+    '\x1b[32m%s\x1b[0m',
+    '[+] 🚀 Sever is listening on:',
+    `http://localhost:${ENV.PORT}`
+  );
 });
