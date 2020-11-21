@@ -9,18 +9,20 @@
     "server:add": "yarn workspace @dream/server --use-yarnrc .yarnrc add",
     "server:add:dev": "yarn workspace @dream/server --use-yarnrc .yarnrc add --dev",
 
-    "web:add": "yarn workspace @dream/web --use-yarnrc .yarnrc add",
-    "web:add:dev": "yarn workspace @dream/web --use-yarnrc .yarnrc add --dev",
+    "web:add": "yarn workspace @dream/web add --use-yarnrc .yarnrc ",
+    "web:add:dev": "yarn workspace @dream/web add --dev --use-yarnrc .yarnrc " ,
     "web:dev": "yarn workspace @dream/web run dev",
     "web:build": "yarn workspace @dream/web run build",
     "web:start": "yarn workspace @dream/web run start",
 
-    "auth:add": "yarn workspace @dream/auth --use-yarnrc .yarnrc add",
-    "auth:add:dev": "yarn workspace @dream/auth --use-yarnrc .yarnrc add --dev",
+    "auth:add": "yarn workspace @dream/auth add --use-yarnrc .yarnrc",
+    "auth:add:dev": "yarn workspace @dream/auth add --dev --use-yarnrc .yarnrc",
     "auth:dev": "yarn workspace @dream/auth run dev",
 
-    "docker:dev": "$GOPATH/bin/modd --bell --notify --debug --file ./services/docker/modd.conf",
-
+    "docker:dev": "yarn workspace @dream/docker run dev",
+    "docker:add": "yarn workspace @dream/docker add --use-yarnrc .yarnrc",
+    "docker:add:dev": "yarn workspace @dream/docker add --dev --use-yarnrc .yarnrc",
+    
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "dev": "yarn workspaces run dev",

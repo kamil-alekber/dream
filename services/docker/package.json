@@ -1,0 +1,30 @@
+{
+  "name": "@dream/docker",
+  "version": "1.0.0",
+  "description": "Docker service for running containers with user specific files",
+  "main": "index.js",
+  "author": "Kamil A.",
+  "license": "MIT",
+  "scripts": {
+    "dev-log": "ts-node-dev --rs --files --debug --project ./tsconfig.json --notify --watch .env.dev ./src/ >node.access.log 2>error-file.txt",
+    "dev": "ts-node-dev --rs --files --debug --project ./tsconfig.json --notify --watch .env.dev ./src",
+    "tsc": "tsc --build tsconfig.build.json",
+    "build": "npm run tsc",
+    "start": "rm -rf build && npm run build && NODE_ENV=prod node build"
+  },
+  "dependencies": {
+    "@typegoose/typegoose": "7.4.2",
+    "dockerode": "3.2.1",
+    "dotenv": "8.2.0",
+    "express": "4.17.1",
+    "mongoose": "5.10.15"
+  },
+  "devDependencies": {
+    "@types/dockerode": "3.2.1",
+    "@types/express": "4.17.9",
+    "@types/mongoose": "5.10.1",
+    "@types/node": "14.14.9",
+    "morgan": "1.10.0",
+    "ts-node-dev": "1.0.0"
+  }
+}

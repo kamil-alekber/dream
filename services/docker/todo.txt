@@ -1,2 +1,0 @@
-1. recieve file 
-2. run the container with that file from pre-built image
