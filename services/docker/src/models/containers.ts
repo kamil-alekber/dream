@@ -17,9 +17,6 @@ class ContainersSchema {
 
   @prop({ required: true })
   public userId: string;
-
-  @prop()
-  public status?: string;
 }
 
 export const Containers = getModelForClass(ContainersSchema);

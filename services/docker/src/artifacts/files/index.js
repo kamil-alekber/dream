@@ -1,10 +1,6 @@
-console.log('You have done it!!!');
+console.log("hello world");
+console.log(
+  "changed file inside download folder, without re-ranning container"
+);
 
-let count = 0;
-const interval = setInterval(() => {
-  if (count > 10) {
-    clearInterval(interval);
-  }
-  console.log('Interval is at:', count);
-  count += 1;
-}, 1000);
+console.log("easy life");
