@@ -9,11 +9,11 @@
     "server:add": "yarn workspace @dream/server --use-yarnrc .yarnrc add",
     "server:add:dev": "yarn workspace @dream/server --use-yarnrc .yarnrc add --dev",
 
-    "web:add": "yarn workspace @dream/web add --use-yarnrc .yarnrc ",
-    "web:add:dev": "yarn workspace @dream/web add --dev --use-yarnrc .yarnrc " ,
-    "web:dev": "yarn workspace @dream/web run dev",
-    "web:build": "yarn workspace @dream/web run build",
-    "web:start": "yarn workspace @dream/web run start",
+    "client:add": "yarn workspace @dream/client add --use-yarnrc .yarnrc ",
+    "client:add:dev": "yarn workspace @dream/client add --dev --use-yarnrc .yarnrc " ,
+    "client:dev": "yarn workspace @dream/client run dev",
+    "client:build": "yarn workspace @dream/client run build",
+    "client:start": "yarn workspace @dream/client run start",
 
     "auth:add": "yarn workspace @dream/auth add --use-yarnrc .yarnrc",
     "auth:add:dev": "yarn workspace @dream/auth add --dev --use-yarnrc .yarnrc",

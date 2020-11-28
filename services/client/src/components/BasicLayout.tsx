@@ -8,7 +8,7 @@ const { Header, Content, Footer } = Layout;
 export function BasicLayout({ children }: { children: React.ReactNode }) {
   const actionMenu = (
     <Menu>
-      <Menu.Item key="0">
+      <Menu.Item>
         <Link href="/account">
           <a>
             <UserOutlined /> Account
@@ -26,7 +26,11 @@ export function BasicLayout({ children }: { children: React.ReactNode }) {
   return (
     <Layout className="BasicLayout">
       <Header className="header">
-        <div className="logo">Code Up</div>
+        <div className="logo">
+          <Link href="/">
+            <a>Code Up</a>
+          </Link>
+        </div>
         <div className="title">Java Script</div>
         <div className="action">
           <Dropdown overlay={actionMenu} trigger={['click']}>
@@ -38,7 +42,7 @@ export function BasicLayout({ children }: { children: React.ReactNode }) {
         <div className="site-layout-content">{children}</div>
       </Content>
       <Footer className="footer" style={{ textAlign: 'center' }}>
-        Ant Design ©2018 Created by Ant UED
+        <p>2020. Code up</p>
       </Footer>
     </Layout>
   );

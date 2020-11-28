@@ -1,5 +1,5 @@
 {
-  "name": "@dream/web",
+  "name": "@dream/client",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
