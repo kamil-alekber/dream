@@ -14,7 +14,7 @@ export function BasicLayout({ children }: { children: React.ReactNode }) {
           <Menu.Item key="3">nav 3</Menu.Item>
         </Menu>
       </Header>
-      <Content className="content" style={{ padding: '0 50px' }}>
+      <Content className="content">
         <div className="site-layout-content">{children}</div>
       </Content>
       <Footer className="footer" style={{ textAlign: 'center' }}>
