@@ -1,28 +1,41 @@
 import { Row, Col, Input, Button } from 'antd';
-import { LeftOutlined, ReloadOutlined } from '@ant-design/icons';
+import { LeftOutlined, ReloadOutlined, ReadOutlined } from '@ant-design/icons';
 import EditorBroswer from '../EditorBroswer';
-import { SyncOutlined, CopyOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from 'react';
 
 export function Courses() {
+  const [codeResult, setCodeResult] = useState('');
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [codeResult]);
+
   return (
     <Row>
       <Col className="learn" xs={1} sm={1} md={8} lg={8} xl={8}>
-        <h3>Learn</h3>
+        <div className="top-panel">
+          <h3>
+            <ReadOutlined /> Learn
+          </h3>
+        </div>
+        <div className="instruction">
+          <h2>Changing Variables</h2>
+          <p>
+            This line creates a message variable and stores the Change the message! text in it.
+            Later in the program, message is used to reference that text inside drawName(), meaning
+            that the message text appears on the screen
+          </p>
+        </div>
       </Col>
       <Col className="code" xs={1} sm={1} md={8} lg={8} xl={8}>
         <div className="window-panel">
           <h3>index.js</h3>
         </div>
-        <EditorBroswer />
-        <div className="action-panel">
-          <Button type="primary">Run</Button>
-          <Button type="link">
-            <SyncOutlined />
-          </Button>
-          <Button type="link">
-            <CopyOutlined />
-          </Button>
-        </div>
+        <EditorBroswer setCodeResult={setCodeResult} />
       </Col>
       <Col className="display" xs={1} sm={1} md={8} lg={8} xl={8}>
         <div className="search-panel">
@@ -34,7 +47,10 @@ export function Courses() {
           </Button>
           <Input />
         </div>
-        Col
+        <div className="code-result">
+          <pre>{codeResult}</pre>
+          <div ref={scrollRef}></div>
+        </div>
       </Col>
     </Row>
   );

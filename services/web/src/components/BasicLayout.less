@@ -2,12 +2,28 @@
   height: 100vh;
 
   .header {
-    height: 10%;
+    color: #fff;
+    height: 7%;
+    display: flex;
+    justify-content: space-between;
+
+    .action {
+      cursor: pointer;
+    }
   }
 
   .content {
     height: 80%;
     .learn {
+      .top-panel {
+        padding: 5px 10px;
+        height: 32;
+      }
+
+      .instruction {
+        padding: 5px 10px;
+        background-color: #fff;
+      }
     }
 
     .code {
@@ -37,6 +53,11 @@
     .display {
       .search-panel {
         display: flex;
+      }
+
+      .code-result {
+        overflow: scroll;
+        height: 80vh;
       }
     }
   }

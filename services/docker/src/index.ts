@@ -1,14 +1,42 @@
 import express from 'express';
-import formidable from 'formidable';
+// import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { DockerService } from './docker';
 import { ENV } from './env';
+import cors from 'cors';
+import { CustomResponse } from './customResponse';
 
 const app = express();
 
-app.use(express.json());
+const whitelist = process.env.NODE_ENV === 'prod' ? [''] : ['http://localhost:3000'];
+
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(
+  cors({
+    optionsSuccessStatus: 200,
+    credentials: true,
+    allowedHeaders: [
+      'Authorization',
+      'Refresh',
+      'Content-Type',
+      'Cookie',
+      'Origin',
+      'X-Requested-With',
+      'userid',
+      'Accept',
+    ],
+    methods: ['GET', 'HEAD', 'POST', 'OPTIONS'],
+    origin: (origin: string | undefined, callback: any) => {
+      if (whitelist.includes(`${origin}`) || typeof origin === 'undefined' || origin === 'null') {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  })
+);
 
 if (ENV.NODE_ENV !== 'prod') {
   const morgan = require('morgan');
@@ -37,32 +65,36 @@ app.get('/run', async (req, res) => {
 // 202 accepted
 
 app.post('/run', async (req, res) => {
-  // const container = await DockerService.createContainer();
+  const code = req.body.code;
+  if (!code) return CustomResponse.malformed(res);
 
-  // const logs = await container.logs({
-  //   follow: true,
-  //   stdout: true,
-  //   stderr: true,
-  //   details: false,
-  //   tail: 10,
-  //   timestamps: true,
-  // });
+  fs.writeFileSync(path.resolve(`${process.cwd()}/src/artifacts/files/`, 'index.js'), code);
 
-  // logs.pipe(res);
+  const container = await DockerService.createContainer();
 
-  const form = new formidable.IncomingForm();
-  form.parse(req, function (err, fields, files) {
-    const oldPath = files['file'].path;
-    const newPath = path.resolve(`${process.cwd()}/src/artifacts/files/`, files['file'].name);
-    const rawData = fs.readFileSync(oldPath);
-
-    fs.writeFile(newPath, rawData, function (err) {
-      if (err) console.log(err);
-
-      console.log(req.body);
-      return res.send('Successfully uploaded');
-    });
+  const logs = await container.logs({
+    follow: true,
+    stdout: true,
+    stderr: true,
+    details: true,
+    tail: 100,
+    // timestamps: true,
   });
+
+  return logs.pipe(res);
+  // const form = new formidable.IncomingForm();
+  // form.parse(req, function (err, fields, files) {
+  //   const oldPath = files['file'].path;
+  //   const newPath = path.resolve(`${process.cwd()}/src/artifacts/files/`, files['file'].name);
+  //   const rawData = fs.readFileSync(oldPath);
+
+  //   fs.writeFile(newPath, rawData, function (err) {
+  //     if (err) console.log(err);
+
+  //     console.log(req.body);
+  //     return res.send('Successfully uploaded');
+  //   });
+  // });
 });
 
 app.listen(ENV.PORT, () => {

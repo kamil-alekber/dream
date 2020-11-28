@@ -1,6 +1,5 @@
-console.log("hello world");
-console.log(
-  "changed file inside download folder, without re-ranning container"
-);
+const fs = require('fs');
 
-console.log("easy life");
+fs.readdirSync(process.cwd()).forEach(file => {
+  console.log(file);
+});

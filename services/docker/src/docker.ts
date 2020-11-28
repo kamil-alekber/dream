@@ -4,11 +4,12 @@ import { Containers } from './models/containers';
 import { v4 as uuid4 } from 'uuid';
 import { ENV } from './env';
 
-export const docker = new Docker({
+const docker = new Docker({
   port: ENV.DOCKER_PORT,
 });
 
 export class DockerService {
+  static docker = docker;
   static port = ENV.DOCKER_PORT;
 
   static async createImage() {
