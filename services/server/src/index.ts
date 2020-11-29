@@ -45,7 +45,7 @@ app.use(appRoutes);
 app.listen(ENV.PORT, () => {
   console.warn(
     '\x1b[32m%s\x1b[0m',
-    '[+] 🚀 Docker Server is listening on:',
+    '[+] 🚀 Main Server is listening on:',
     `http://localhost:${ENV.PORT}`
   );
 });
