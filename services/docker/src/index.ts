@@ -1,5 +1,5 @@
 import express from 'express';
-import { ENV } from './env';
+import { ENV } from './helpers/env';
 import cors from 'cors';
 import { appRoutes } from './router';
 
@@ -39,6 +39,7 @@ if (ENV.NODE_ENV !== 'prod') {
   app.use(morgan('dev'));
 }
 
+// [APP ROUTES]
 app.use(appRoutes);
 
 app.listen(ENV.PORT, () => {

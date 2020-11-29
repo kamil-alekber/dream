@@ -9,7 +9,7 @@ const router = Router();
 router
   .route('/run')
   .get(async (req, res) => {
-    const container = await DockerService.createContainer();
+    const container = await DockerService.createContainer('dream-docker-img', 'js');
 
     const logs = await container.logs({
       follow: true,
@@ -24,11 +24,13 @@ router
   })
   .post(async (req, res) => {
     const code = req.body.code;
-    if (!code) return CustomResponse.badRequest(res);
+    const kind = req.body.kind;
 
-    fs.writeFileSync(path.resolve(`${process.cwd()}/src/artifacts/files/`, 'index.js'), code);
+    if (!code || !kind) return CustomResponse.badRequest(res);
+    // TODO: pick up user from the session or token ???
+    fs.writeFileSync(path.resolve(`${process.cwd()}/artifacts/${kind}/users`, 'index.js'), code);
 
-    const container = await DockerService.createContainer();
+    const container = await DockerService.createContainer('dream-docker-img', 'js');
 
     const logs = await container.logs({
       follow: true,
@@ -40,19 +42,20 @@ router
     });
 
     return logs.pipe(res);
-    // const form = new formidable.IncomingForm();
-    // form.parse(req, function (err, fields, files) {
-    //   const oldPath = files['file'].path;
-    //   const newPath = path.resolve(`${process.cwd()}/src/artifacts/files/`, files['file'].name);
-    //   const rawData = fs.readFileSync(oldPath);
-
-    //   fs.writeFile(newPath, rawData, function (err) {
-    //     if (err) console.log(err);
-
-    //     console.log(req.body);
-    //     return res.send('Successfully uploaded');
-    //   });
-    // });
   });
 
 export { router as ContainerRoutes };
+
+// const form = new formidable.IncomingForm();
+// form.parse(req, function (err, fields, files) {
+//   const oldPath = files['file'].path;
+//   const newPath = path.resolve(`${process.cwd()}/src/artifacts/files/`, files['file'].name);
+//   const rawData = fs.readFileSync(oldPath);
+
+//   fs.writeFile(newPath, rawData, function (err) {
+//     if (err) console.log(err);
+
+//     console.log(req.body);
+//     return res.send('Successfully uploaded');
+//   });
+// });

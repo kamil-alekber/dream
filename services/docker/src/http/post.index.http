@@ -1,7 +1,7 @@
-POST http://localhost:5000/run HTTP/1.1
+POST http://localhost:5000/c/run HTTP/1.1
 content-type: application/json
 
 {
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+    "code": "const me = 123321; console.log(me)",
+    "kind": "js"
 }
