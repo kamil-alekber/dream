@@ -32,9 +32,6 @@ export function Courses() {
         </div>
       </Col>
       <Col className="code" xs={1} sm={1} md={8} lg={8} xl={8}>
-        <div className="window-panel">
-          <h3>index.js</h3>
-        </div>
         <EditorBroswer setCodeResult={setCodeResult} />
       </Col>
       <Col className="display" xs={1} sm={1} md={8} lg={8} xl={8}>

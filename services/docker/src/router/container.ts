@@ -9,7 +9,7 @@ const router = Router();
 router.get('/info', async (req, res) => {
   const kind = req.body.kind;
   const userId = req.body.userId;
-  if (!kind || !userId) return CustomResponse.badRequest(res);
+  if (!kind || !userId) return CustomResponse.badRequest(res, 'Required Fields: [kind, userId]');
 
   // get the userInfo
   const container = await DockerService.getUserContainer({
