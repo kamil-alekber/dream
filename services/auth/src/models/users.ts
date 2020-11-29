@@ -16,10 +16,13 @@ class UsersSchema {
   public userId: string;
 
   @prop({ required: true })
-  public name: string;
+  public firstName: string;
 
   @prop({ required: true })
-  public surname: string;
+  public lastName: string;
+
+  @prop({ required: true })
+  public email: string;
 }
 
 export const Users = getModelForClass(UsersSchema);

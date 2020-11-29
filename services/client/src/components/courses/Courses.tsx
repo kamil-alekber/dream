@@ -42,7 +42,14 @@ export function Courses() {
           <Button>
             <ReloadOutlined />
           </Button>
-          <Input />
+          <Input
+            defaultValue="http://localhost:3000"
+            onKeyPress={(event) => {
+              if (event.key === 'Enter') {
+                console.log('submit');
+              }
+            }}
+          />
         </div>
         <div className="code-result">
           <pre>{codeResult}</pre>

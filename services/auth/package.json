@@ -6,8 +6,8 @@
   "author": "Kamil A.",
   "license": "MIT",
   "scripts": {
-    "dev-log": "ts-node-dev --rs --files --debug --project ./tsconfig.json --notify --watch .env.dev ./src/ >node.access.log 2>error-file.txt",
-    "dev": "ts-node-dev --rs --files --debug --project ./tsconfig.json --notify --watch .env.dev ./src",
+    "dev-log": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src/ >node.access.log 2>error-file.txt",
+    "dev": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src",
     "tsc": "tsc --build tsconfig.build.json",
     "build": "npm run tsc",
     "start": "rm -rf build && npm run build && NODE_ENV=prod node build"

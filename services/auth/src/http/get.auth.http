@@ -1,0 +1,2 @@
+GET http://localhost:4003/auth HTTP/1.1
+
