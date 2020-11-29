@@ -5,7 +5,7 @@ import {
   DocumentType,
   ReturnModelType,
 } from '@typegoose/typegoose';
-
+import { Kind } from '../docker';
 @modelOptions({
   schemaOptions: {
     collection: 'container',
@@ -17,6 +17,9 @@ class ContainersSchema {
 
   @prop({ required: true })
   public userId: string;
+
+  @prop({ required: true, type: String })
+  public kind: Kind;
 }
 
 export const Containers = getModelForClass(ContainersSchema);

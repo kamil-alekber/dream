@@ -3,12 +3,13 @@ import path from 'path';
 import { Containers } from './models/containers';
 import { v4 as uuid4 } from 'uuid';
 import { ENV } from './helpers/env';
+import { Stream } from 'stream';
 
 const docker = new Docker({
   port: ENV.DOCKER_PORT,
 });
 
-type Kind = 'hmtl' | 'css' | 'js' | 'ts' | 'jsx';
+export type Kind = 'hmtl' | 'css' | 'js' | 'ts' | 'jsx';
 
 export class DockerService {
   static docker = docker;
@@ -17,13 +18,14 @@ export class DockerService {
   static async createImage(imageName: string, kind: Kind) {
     const listImages = await docker.listImages({ dangling: false });
     const existingImg = listImages.find((img) => img.RepoTags.includes(imageName + ':latest'));
+    // const images = await dockerode.listImages({ filters: { reference: imageNamesArr } });
 
     if (!existingImg) {
       const buildImageStream = await docker.buildImage(
         {
           context: path.resolve(process.cwd(), 'artifacts', kind),
           // TODO: choose the folder of a specific user from token ???
-          src: ['Dockerfile', 'entry', 'users'],
+          src: ['Dockerfile', 'entry', 'users', 'run.sh'],
         },
         { t: imageName }
       );
@@ -40,14 +42,39 @@ export class DockerService {
     return imageName;
   }
 
+  static async getUserContainer({ userId, kind }: { userId: string; kind: Kind }) {
+    const existingContainer = await Containers.findOne({ userId: userId, kind }, 'containerId');
+    if (!existingContainer) return null;
+    console.log('found in db', existingContainer.containerId);
+
+    const container = docker.getContainer(existingContainer?.containerId);
+
+    return container
+      .stats()
+      .then(async (stats) => {
+        console.log('stats', { stats });
+        const containerInfo = await container.inspect();
+        return { container: containerInfo, status: 'Exists' };
+      })
+      .catch((err) => {
+        if (err.statusCode !== 404) throw new Error(err);
+        return { container: null, status: 'Not Found' };
+      });
+  }
+
   static async createContainer(imageName = 'dream-docker-img', kind: Kind) {
     const createdImageName = await DockerService.createImage(imageName, kind);
 
     let container;
     let existingContainer = await Containers.findOne({}, 'containerId');
+    const containerDocker = await DockerService.getUserContainer({
+      userId: existingContainer?.userId || '',
+      kind,
+    });
 
-    if (!existingContainer?.containerId) {
+    if (!containerDocker?.container) {
       try {
+        await existingContainer?.remove();
         container = await docker.createContainer({
           Image: createdImageName,
           name: `docker-test-${kind}-${+new Date()}`,
@@ -60,13 +87,13 @@ export class DockerService {
           HostConfig: {
             // :rw
             Binds: [
-              `${process.cwd()}/artifacts/${kind}/entry:/usr/src/app/artifacts:r`,
-              `${process.cwd()}/artifacts/${kind}/users:/usr/src/app/artifacts:rw`,
+              `${process.cwd()}/artifacts/${kind}/entry:/usr/src/app/entry`,
+              `${process.cwd()}/artifacts/${kind}/users:/usr/src/app/users:rw`,
             ],
           },
         });
         // provide real userId maybe remove even from here to decouple db logic
-        await Containers.create({ containerId: container.id, userId: uuid4() });
+        await existingContainer?.updateOne({ containerId: container.id }, { upsert: true });
       } catch (error) {
         console.error(error);
       }
@@ -95,6 +122,50 @@ export class DockerService {
           container.remove();
         }
       });
+    });
+  }
+
+  static async imageExists(imageNames: string | string[]) {
+    const imageNamesArr: string[] = typeof imageNames === 'string' ? [imageNames] : imageNames;
+    const images = await docker.listImages({ filters: { reference: imageNamesArr } });
+    return images.length > 0;
+  }
+
+  static async pullImageAsync(imageName: string): Promise<Docker.Image> {
+    return new Promise(async (resolve, reject) => {
+      const imageNameWithTag = imageName.indexOf(':') > 0 ? imageName : `${imageName}:latest`;
+
+      if (await DockerService.imageExists(imageNameWithTag)) {
+        return docker.getImage(imageNameWithTag);
+      }
+
+      docker.pull(imageNameWithTag, (pullError: any, stream: Stream) => {
+        if (pullError) {
+          reject(pullError);
+        }
+        if (!stream) {
+          // throw new Error(`Image '${imageNameWithTag}' doesn't exists`);
+          reject(`Image '${imageNameWithTag}' doesn't exists`);
+        }
+
+        docker.modem.followProgress(
+          stream,
+          (error: any, output: any) => {
+            // onFinished
+            if (error) {
+              reject(error);
+            }
+
+            resolve(docker.getImage(imageNameWithTag));
+          },
+          (event: any) => {
+            //TODO: check the event obj
+            console.log('progress pulling img:', event);
+          }
+        );
+      });
+
+      return null;
     });
   }
 }

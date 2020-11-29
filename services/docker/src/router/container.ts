@@ -1,10 +1,24 @@
 import { Router } from 'express';
 import { CustomResponse } from '../helpers/customResponse';
-import { DockerService } from '../docker';
+import { DockerService, Kind } from '../docker';
 import fs from 'fs';
 import path from 'path';
 
 const router = Router();
+
+router.get('/info', async (req, res) => {
+  const kind = req.body.kind;
+  if (!kind) return CustomResponse.badRequest(res);
+
+  // get the userInfo
+  const container = await DockerService.getUserContainer({
+    userId: '845ac9ba-a980-40e9-a1f7-87489c4ea515',
+    kind: kind as Kind,
+  });
+  console.log({ container });
+
+  return CustomResponse.ok(res, undefined, container);
+});
 
 router
   .route('/run')
