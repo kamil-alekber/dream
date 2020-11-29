@@ -43,16 +43,14 @@ export class DockerService {
   }
 
   static async getUserContainer({ userId, kind }: { userId: string; kind: Kind }) {
-    const existingContainer = await Containers.findOne({ userId: userId, kind }, 'containerId');
+    const existingContainer = await Containers.findOne({ userId, kind }, 'containerId');
     if (!existingContainer) return null;
-    console.log('found in db', existingContainer.containerId);
 
     const container = docker.getContainer(existingContainer?.containerId);
 
     return container
       .stats()
-      .then(async (stats) => {
-        console.log('stats', { stats });
+      .then(async (_stats) => {
         const containerInfo = await container.inspect();
         return { container: containerInfo, status: 'Exists' };
       })
@@ -66,7 +64,7 @@ export class DockerService {
     const createdImageName = await DockerService.createImage(imageName, kind);
 
     let container;
-    let existingContainer = await Containers.findOne({}, 'containerId');
+    let existingContainer = await Containers.findOne({});
     const containerDocker = await DockerService.getUserContainer({
       userId: existingContainer?.userId || '',
       kind,
@@ -74,7 +72,6 @@ export class DockerService {
 
     if (!containerDocker?.container) {
       try {
-        await existingContainer?.remove();
         container = await docker.createContainer({
           Image: createdImageName,
           name: `docker-test-${kind}-${+new Date()}`,
@@ -93,7 +90,15 @@ export class DockerService {
           },
         });
         // provide real userId maybe remove even from here to decouple db logic
-        await existingContainer?.updateOne({ containerId: container.id }, { upsert: true });
+        await Containers?.updateOne(
+          { userId: existingContainer?.userId },
+          {
+            containerId: container.id,
+            userId: existingContainer?.userId || uuid4(),
+            kind: existingContainer?.kind || kind,
+          },
+          { upsert: true }
+        );
       } catch (error) {
         console.error(error);
       }
