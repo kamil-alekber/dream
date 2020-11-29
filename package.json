@@ -22,6 +22,10 @@
     "docker:dev": "yarn workspace @dream/docker run dev",
     "docker:add": "yarn workspace @dream/docker add --use-yarnrc .yarnrc",
     "docker:add:dev": "yarn workspace @dream/docker add --dev --use-yarnrc .yarnrc",
+
+    "worker:dev": "yarn workspace @dream/worker run dev",
+    "worker:add": "yarn workspace @dream/worker add --use-yarnrc .yarnrc",
+    "worker:add:dev": "yarn workspace @dream/worker add --dev --use-yarnrc .yarnrc",
     
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",

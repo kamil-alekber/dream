@@ -1,0 +1,23 @@
+{
+  "name": "@dream/worker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev-log": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src/ >node.access.log 2>error-file.txt",
+    "dev": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src",
+    "tsc": "tsc --build tsconfig.build.json",
+    "build": "npm run tsc",
+    "start": "rm -rf build && npm run build && NODE_ENV=prod node build"
+  },
+  "dependencies": {
+    "dotenv": "8.2.0",
+    "express": "4.17.1",
+    "node-cron": "2.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.8",
+    "@types/node": "14.14.10",
+    "@types/node-cron": "2.0.3"
+  }
+}
