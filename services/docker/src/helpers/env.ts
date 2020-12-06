@@ -13,6 +13,7 @@ export class ENV {
   static PORT = parseInt(process.env.PORT || '5000');
   static DOCKER_PORT = parseInt(process.env.DOCKER_PORT || '2375');
   static MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/dream';
+  static JWT = process.env.JWT || '';
 }
 
 (async () => {

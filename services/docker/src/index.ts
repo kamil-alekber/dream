@@ -2,6 +2,8 @@ import express from 'express';
 import { ENV } from './helpers/env';
 import cors from 'cors';
 import { appRoutes } from './router';
+import jwt from 'jsonwebtoken';
+import { cookieParser, authorization } from './middlewares';
 
 const app = express();
 
@@ -38,9 +40,15 @@ if (ENV.NODE_ENV !== 'prod') {
   const morgan = require('morgan');
   app.use(morgan('dev'));
 }
+// TODO: remove from here to the auth service
+app.get('/login', (req, res) => {
+  const token = jwt.sign({ userId: '8959a248-d1f5-4124-b20b-7dacbea54bdf' }, ENV.JWT);
+  res.cookie('docker', token);
+  res.send(token);
+});
 
 // [APP ROUTES]
-app.use(appRoutes);
+app.use(cookieParser, authorization, appRoutes);
 
 app.listen(ENV.PORT, () => {
   console.warn(

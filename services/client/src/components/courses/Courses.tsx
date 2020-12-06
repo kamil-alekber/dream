@@ -1,6 +1,6 @@
 import { Row, Col, Input, Button } from 'antd';
 import { LeftOutlined, ReloadOutlined, ReadOutlined } from '@ant-design/icons';
-import EditorBroswer from '../EditorBroswer';
+import { Editor } from '../EditorBrowser';
 import { useEffect, useRef, useState } from 'react';
 
 export function Courses() {
@@ -32,7 +32,7 @@ export function Courses() {
         </div>
       </Col>
       <Col className="code" xs={1} sm={1} md={8} lg={8} xl={8}>
-        <EditorBroswer setCodeResult={setCodeResult} />
+        <Editor setCodeResult={setCodeResult} />
       </Col>
       <Col className="display" xs={1} sm={1} md={8} lg={8} xl={8}>
         <div className="search-panel">

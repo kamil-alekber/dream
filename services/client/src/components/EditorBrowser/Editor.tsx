@@ -1,19 +1,12 @@
 import React, { useState, SetStateAction } from 'react';
 import AceEditor from 'react-ace';
-import {
-  SyncOutlined,
-  CopyOutlined,
-  FolderOutlined,
-  FolderOpenOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
-import { Button, Tree, Dropdown, Tabs } from 'antd';
+import { SyncOutlined, CopyOutlined, FolderOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { Button, Tree, Dropdown } from 'antd';
 
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
 const { DirectoryTree } = Tree;
-const { TabPane } = Tabs;
 interface Props {
   setCodeResult: React.Dispatch<SetStateAction<string>>;
 }
