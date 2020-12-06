@@ -1,9 +1,10 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { ENV } from './helpers/env';
 import cors from 'cors';
 import { appRoutes } from './router';
 import jwt from 'jsonwebtoken';
-import { cookieParser, authorization } from './middlewares';
+import { cookieParser, authorization, green } from './middlewares';
+import { CustomResponse } from './helpers/customResponse';
 
 const app = express();
 
@@ -22,7 +23,6 @@ app.use(
       'Cookie',
       'Origin',
       'X-Requested-With',
-      'userid',
       'Accept',
     ],
     methods: ['GET', 'HEAD', 'POST', 'OPTIONS'],
@@ -40,15 +40,9 @@ if (ENV.NODE_ENV !== 'prod') {
   const morgan = require('morgan');
   app.use(morgan('dev'));
 }
-// TODO: remove from here to the auth service
-app.get('/login', (req, res) => {
-  const token = jwt.sign({ userId: '8959a248-d1f5-4124-b20b-7dacbea54bdf' }, ENV.JWT);
-  res.cookie('docker', token);
-  res.send(token);
-});
-
 // [APP ROUTES]
-app.use(cookieParser, authorization, appRoutes);
+// TODO: remove green routes from here to the auth service
+app.use(green, cookieParser, authorization, appRoutes);
 
 app.listen(ENV.PORT, () => {
   console.warn(

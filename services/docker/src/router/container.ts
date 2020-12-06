@@ -4,9 +4,9 @@ import { DockerService, Kind } from '../docker';
 import fs from 'fs';
 import path from 'path';
 
-const router = Router();
+const ContainerRoutes = Router();
 
-router.get('/info', async (req, res) => {
+ContainerRoutes.get('/info', async (req, res) => {
   const kind = req.body.kind;
   const userId = req.body.userId;
   if (!kind || !userId) return CustomResponse.badRequest(res, 'Required Fields: [kind, userId]');
@@ -20,8 +20,7 @@ router.get('/info', async (req, res) => {
   return CustomResponse.ok(res, undefined, container);
 });
 
-router
-  .route('/run')
+ContainerRoutes.route('/run')
   .get(async (req, res) => {
     const container = await DockerService.createContainer('dream-docker-img', 'js');
 
@@ -58,7 +57,7 @@ router
     return logs.pipe(res);
   });
 
-export { router as ContainerRoutes };
+export { ContainerRoutes };
 
 // const form = new formidable.IncomingForm();
 // form.parse(req, function (err, fields, files) {

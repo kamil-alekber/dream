@@ -18,7 +18,7 @@ app
 
     server.listen(process.env.PORT, (err) => {
       if (err) throw err;
-      console.log(`> Ready on ${process.env.HOST}`);
+      console.warn('\x1b[32m%s\x1b[0m', '[+] 👀 Client is listening on', `${process.env.HOST}`);
     });
   })
   .catch((ex) => {
