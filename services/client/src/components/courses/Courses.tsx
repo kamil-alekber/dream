@@ -15,7 +15,7 @@ export function Courses() {
   }, [codeResult]);
 
   return (
-    <Row>
+    <Row style={{ height: '100%' }}>
       <Col className="learn" xs={1} sm={1} md={8} lg={8} xl={8}>
         <div className="top-panel">
           <h3>

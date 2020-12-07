@@ -1,8 +1,8 @@
-import React, { useState, SetStateAction } from 'react';
+import React, { useState, SetStateAction, useRef } from 'react';
 import AceEditor from 'react-ace';
 import { SyncOutlined, CopyOutlined, FolderOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Button, Tree, Dropdown } from 'antd';
-
+import { useRouter } from 'next/router';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
@@ -16,12 +16,15 @@ export default function Editor({ setCodeResult }: Props) {
   const [selectedItem, setSelectedItem] = useState('');
   const [fileTreeOpen, setFileTreeOpen] = useState(false);
 
+  const [running, setRunning] = useState(false);
+  const { query } = useRouter();
+
   async function runCodeHandler() {
-    const res = await fetch('http://localhost:5000/run', {
+    const res = await fetch('http://localhost:5000/c/run', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ ...query, code }),
     });
 
     return res.text();
@@ -88,12 +91,14 @@ export default function Editor({ setCodeResult }: Props) {
       />
       <div className="action-panel">
         <Button
+          loading={running}
           onClick={async () => {
+            setRunning(true);
             const res = await runCodeHandler();
-            console.log({ res });
             if (res) {
               setCodeResult(res);
             }
+            setRunning(false);
           }}
           size="large"
           type="primary"

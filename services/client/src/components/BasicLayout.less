@@ -1,11 +1,10 @@
 .BasicLayout {
-  max-height: 100vh;
   overflow: hidden;
+  height: 100vh;
 
   .header {
     color: #fff;
     background-color: #26282c;
-    height: 7%;
     display: flex;
     justify-content: space-between;
 
@@ -15,7 +14,7 @@
   }
 
   .content {
-    height: 83%;
+    height: 100%;
     .learn {
       .top-panel {
         padding: 5px 10px;
@@ -29,10 +28,11 @@
     }
 
     .code {
-      height: 74.4vh;
       background-color: #1c2022;
       color: #fff;
-
+      display: flex;
+      justify-content: space-evenly;
+      flex-direction: column;
       .window-panel {
         padding: 5px 10px 0 10px;
 
@@ -67,7 +67,9 @@
   }
 
   .footer {
-    height: 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     color: #fff;
     background-color: #26282c;
   }
