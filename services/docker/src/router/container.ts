@@ -28,8 +28,8 @@ ContainerRoutes.route('/run').post(async (req, res) => {
 
   // exec() and spawn()
   // 1. create image if there is not
-
-  exec(`docker image ls -f reference=${kind}-${course}`, (err, stdout, stderr) => {
+  const imageName = `${kind}-${course}`;
+  exec(`docker image ls -f reference=${imageName}`, (err, stdout, stderr) => {
     if (err) {
       console.log(`error: ${err.message}`);
     }
@@ -37,10 +37,10 @@ ContainerRoutes.route('/run').post(async (req, res) => {
       console.log(`stderr: ${stderr}`);
     }
 
-    const existingImg = stdout.includes(`${kind}-${course}`);
+    const existingImg = stdout.includes(imageName);
     if (!existingImg) {
       exec(
-        `docker build -t ${kind}-${course} ${process.cwd()}/artifacts/${kind}/${course}`,
+        `docker build -t ${imageName}${process.cwd()}/artifacts/${kind}/${course}`,
         (err, stdout, stderr) => {
           if (err) {
             console.log(`error: ${err.message}`);
@@ -52,35 +52,29 @@ ContainerRoutes.route('/run').post(async (req, res) => {
         }
       );
     } else {
-      console.log(`Using Cached Img: ${kind}-${course}`);
+      console.log(`Using Cached Img: ${imageName}`);
     }
   });
 
   // 2. Run the container
+  const name = `${imageName}-${req.user}`;
+  const mountVolume = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}:/usr/src/app`;
+  const cmd = `node users/${req.user}/index.js`;
+  // const cmd = 'ls -lha';
   exec(
-    `docker run --rm --name ${kind}-${course}-${req.user} ${kind}-${course}`,
+    `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
     (err, stdout, stderr) => {
       if (err) {
         console.log(`error: ${err.message}`);
       } else if (stderr) {
         console.log(`stderr: ${stderr}`);
       } else {
-        console.log(stdout);
-
+        console.log('Running Docker Container:', name);
         res.status(200).write(stdout);
         res.end();
       }
     }
   );
-  // after writing to a folder we can run docker container
-  // const logs = await container.logs({
-  //   follow: true,
-  //   stdout: true,
-  //   stderr: true,
-  //   details: true,
-  //   tail: 100,
-  //   // timestamps: true,
-  // });
 });
 
 export { ContainerRoutes };
