@@ -59,6 +59,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
   // 2. Run the container
   const name = `${imageName}-${req.user}`;
   const mountVolume = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}:/usr/src/app`;
+  // TODO: change the main file
   const cmd = `node users/${req.user}/index.js`;
   // const cmd = 'ls -lha';
   exec(

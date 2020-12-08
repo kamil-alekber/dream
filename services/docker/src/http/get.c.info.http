@@ -1,7 +1,4 @@
-GET http://localhost:5000/c/info HTTP/1.1
+GET http://localhost:5001/ HTTP/1.1
 content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4OTU5YTI0OC1kMWY1LTQxMjQtYjIwYi03ZGFjYmVhNTRiZGYiLCJpYXQiOjE2MDcyNTkwMTd9.MpttHBq0V0Io8BrDi_BJldWfFXbZ5UXzbe537ANloc8
 
-{
-    "kind": "js", 
-    "userId": "8959a248-d1f5-4124-b20b-7dacbea54bdf"
-}
