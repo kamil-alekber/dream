@@ -1,2 +1,3 @@
 const me = 123;
-console.log(me)
+
+console.log(me + 100)
