@@ -14,7 +14,13 @@ import { useRouter } from 'next/router';
 
 const { Header, Content, Footer } = Layout;
 
-export function BasicLayout({ children }: { children: React.ReactNode }) {
+interface Props {
+  chapters: string[];
+  files: string[];
+  children: React.ReactNode;
+}
+
+export function BasicLayout({ children, chapters }: Props) {
   const { query } = useRouter();
   const actionMenu = (
     <Menu>
@@ -69,12 +75,20 @@ export function BasicLayout({ children }: { children: React.ReactNode }) {
           content={() => {
             return (
               <ul style={{ listStyle: 'none', padding: 0 }}>
-                <li>
-                  <Link href="/">1. Intro</Link>
-                </li>
-                <li>2. Text Align</li>
-                <li>3. Boolean</li>
-                <li>4. Functions</li>
+                {chapters?.map((chapter, i) => {
+                  return (
+                    <li key={i}>
+                      <Link
+                        href="/[kind]/[course]/[chapter]"
+                        as={`/${query.kind}/${query.course}/${chapter}`}
+                      >
+                        <a>
+                          {i + 1}. {chapter}
+                        </a>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             );
           }}

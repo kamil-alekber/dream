@@ -2,14 +2,20 @@ import Link from 'next/link';
 import { Card } from 'antd';
 import { GetServerSideProps } from 'next';
 import { TagPicker } from '../components/TagPicker';
+import { cookieParser } from '../helpers';
 
 interface Props {
-  data?: {
-    artifacts: any;
+  initialProps?: {
+    data: {
+      artifacts: any;
+    };
+    error: true;
+    message: 'Unauthorized';
   };
 }
 
-function Index({ data }: Props) {
+function Index({ initialProps }: Props) {
+  const { data } = initialProps;
   const courses: { kind: string; course: string; chapters: string[]; description: string }[] = [];
 
   Object.keys(data?.artifacts).forEach((kind, i) => {
@@ -31,6 +37,7 @@ function Index({ data }: Props) {
         {courses.map((item, i) => {
           return (
             <Link
+              key={i}
               href="/[kind]/[course]/[chapter]"
               as={`/${item.kind}/${item.course}/${item.chapters[0]}`}
             >
@@ -66,18 +73,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const parsedData = await res.json();
 
   return {
-    props: { data: parsedData?.data || {} }, // will be passed to the page component as props
+    props: { initialProps: parsedData }, // will be passed to the page component as props
   };
 };
-
-function cookieParser(headers: Record<string, any>) {
-  const prepareCookie = headers.cookie?.split('; ');
-  const cookieMap: Record<string, string> = {};
-
-  prepareCookie?.forEach((el) => {
-    const splitted = el.split('=');
-    cookieMap[splitted[0]] = splitted[1];
-  });
-
-  return cookieMap;
-}
