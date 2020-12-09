@@ -18,7 +18,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
   const isExist = fs.existsSync(coursePath);
   if (!isExist) CustomResponse.badRequest(res, 'Course does not exist');
 
-  const userCoursePath = `${coursePath}/users/${req.user}`;
+  const userCoursePath = `${coursePath}/users-input/${req.user}`;
 
   if (!fs.existsSync(userCoursePath)) {
     fs.mkdirSync(userCoursePath);
@@ -60,7 +60,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
   const name = `${imageName}-${req.user}`;
   const mountVolume = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}:/usr/src/app`;
   // TODO: change the main file
-  const cmd = `node users/${req.user}/index.js`;
+  const cmd = `node users-input/${req.user}/index.js`;
   // const cmd = 'ls -lha';
   exec(
     `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
