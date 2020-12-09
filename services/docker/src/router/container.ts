@@ -40,7 +40,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     const existingImg = stdout.includes(imageName);
     if (!existingImg) {
       exec(
-        `docker build -t ${imageName}${process.cwd()}/artifacts/${kind}/${course}`,
+        `docker build -t ${imageName} ${process.cwd()}/artifacts/${kind}/${course}`,
         (err, stdout, stderr) => {
           if (err) {
             console.log(`error: ${err.message}`);
@@ -62,6 +62,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
   // TODO: change the main file
   const cmd = `node users-input/${req.user}/index.js`;
   // const cmd = 'ls -lha';
+  // check if the image is bing build, else it will throw the error
   exec(
     `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
     (err, stdout, stderr) => {

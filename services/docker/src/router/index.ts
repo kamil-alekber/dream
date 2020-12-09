@@ -3,7 +3,7 @@ import { Router } from 'express';
 import path from 'path';
 import { CustomResponse } from '../helpers/customResponse';
 import { ContainerRoutes } from './container';
-import { statSync, readdirSync, fstat } from 'fs';
+import { statSync, readdirSync, fstat, readFileSync } from 'fs';
 const appRoutes = Router();
 
 appRoutes.get('/', (req, res) => {
@@ -41,15 +41,15 @@ appRoutes.get('/artifacts', (req, res) => {
   const { kind, course, chapter } = req.query;
   if (chapter === 'worker-javascript.js') return CustomResponse.ok(res);
   const courseFolder = `${process.cwd()}/artifacts/${kind}/${course}`;
-  const chaptersFolder = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}`;
+  const docFolder = `${courseFolder}/${chapter}/docs/learn.md`;
 
   const chapters = readdirSync(courseFolder).filter((chapter) => {
     return !statSync(`${courseFolder}/${chapter}`).isFile();
   });
 
-  const files = readdirSync(chaptersFolder);
-
-  return CustomResponse.ok(res, '', { files, chapters });
+  const doc = readFileSync(docFolder, 'utf8');
+  // const
+  return CustomResponse.ok(res, '', { doc, chapters });
 });
 
 appRoutes.use('/c', ContainerRoutes);

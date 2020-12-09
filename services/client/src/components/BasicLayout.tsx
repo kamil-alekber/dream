@@ -16,7 +16,6 @@ const { Header, Content, Footer } = Layout;
 
 interface Props {
   chapters: string[];
-  files: string[];
   children: React.ReactNode;
 }
 

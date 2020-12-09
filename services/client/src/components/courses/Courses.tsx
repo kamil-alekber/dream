@@ -2,8 +2,9 @@ import { Row, Col, Input, Button } from 'antd';
 import { LeftOutlined, ReloadOutlined, ReadOutlined } from '@ant-design/icons';
 import { Editor } from '../EditorBrowser';
 import { useEffect, useRef, useState } from 'react';
+import { Doc } from '../../pages/[kind]/[course]/[chapter]';
 
-export function Courses() {
+export function Courses({ doc }: { doc: Doc }) {
   const [codeResult, setCodeResult] = useState('');
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -23,12 +24,8 @@ export function Courses() {
           </h3>
         </div>
         <div className="instruction">
-          <h2>Changing Variables</h2>
-          <p>
-            This line creates a message variable and stores the Change the message! text in it.
-            Later in the program, message is used to reference that text inside drawName(), meaning
-            that the message text appears on the screen
-          </p>
+          <h2>{doc?.data?.title}</h2>
+          <div dangerouslySetInnerHTML={{ __html: doc?.content.split('---')[1] }}></div>
         </div>
       </Col>
       <Col className="code" xs={1} sm={1} md={8} lg={8} xl={8}>
