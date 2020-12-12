@@ -1,4 +1,4 @@
-import React, { useState, SetStateAction, useRef } from 'react';
+import React, { useState, SetStateAction, useRef, useEffect } from 'react';
 import AceEditor from 'react-ace';
 import { SyncOutlined, CopyOutlined, FolderOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { Button, Tree, Dropdown } from 'antd';
@@ -9,14 +9,16 @@ import 'ace-builds/src-noconflict/theme-tomorrow_night';
 const { DirectoryTree } = Tree;
 interface Props {
   setCodeResult: React.Dispatch<SetStateAction<string>>;
+  defaultCode: string;
 }
 
-export default function Editor({ setCodeResult }: Props) {
-  const [code, setCode] = useState('const me = 123;');
+export default function Editor({ setCodeResult, defaultCode }: Props) {
+  const [code, setCode] = useState(defaultCode || '');
+  const [running, setRunning] = useState(false);
+
   const [selectedItem, setSelectedItem] = useState('');
   const [fileTreeOpen, setFileTreeOpen] = useState(false);
 
-  const [running, setRunning] = useState(false);
   const { query } = useRouter();
 
   async function runCodeHandler() {
@@ -75,14 +77,14 @@ export default function Editor({ setCodeResult }: Props) {
         visible={fileTreeOpen}
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button type="primary" onClick={() => setFileTreeOpen(!fileTreeOpen)}>
+          <Button size="large" type="primary" onClick={() => setFileTreeOpen(!fileTreeOpen)}>
             {fileTreeOpen ? <FolderOpenOutlined /> : <FolderOutlined />}
           </Button>
           <h4 style={{ color: '#fff', margin: '0 0 0 10px' }}>{selectedItem}</h4>
         </div>
       </Dropdown>
       <AceEditor
-        defaultValue={code}
+        value={code}
         onChange={(value) => setCode(value)}
         mode="javascript"
         theme="tomorrow_night"

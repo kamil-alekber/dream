@@ -1,5 +1,5 @@
 ---
-title: Intro to the variables
+title: Promises is the best add on to es6
 ---
 
 JavaScript is the best language to learn. You shoold start your carrier now.

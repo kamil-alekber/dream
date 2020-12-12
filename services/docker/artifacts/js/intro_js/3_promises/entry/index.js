@@ -6,3 +6,5 @@ setInterval(() => {
   console.log('interval entry', count);
   count += 1;
 }, 2000);
+
+new Promise();

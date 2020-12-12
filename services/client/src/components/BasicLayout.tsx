@@ -15,14 +15,16 @@ import { useRouter } from 'next/router';
 const { Header, Content, Footer } = Layout;
 
 interface Props {
-  chapters: string[];
+  chapters?: string[];
   children: React.ReactNode;
 }
 
 export function BasicLayout({ children, chapters }: Props) {
-  const { query } = useRouter();
+  const router = useRouter();
+  const { query } = router;
   const actionMenu = (
     <Menu>
+      <div></div>
       <Menu.Item>
         <Link href="/account">
           <a>
@@ -46,7 +48,7 @@ export function BasicLayout({ children, chapters }: Props) {
             <a>Code Up</a>
           </Link>
         </div>
-        <div className="title">Java Script</div>
+        <div className="title">{query.course}</div>
         <div className="action">
           <Dropdown overlay={actionMenu} trigger={['click']}>
             <Avatar size="large" icon={<UserOutlined />} />
@@ -58,9 +60,11 @@ export function BasicLayout({ children, chapters }: Props) {
         <DrawerOpener
           opener={({ show }) => {
             return (
-              <Button onClick={show}>
-                <MenuFoldOutlined /> {query.chapter}
-              </Button>
+              <div style={{ minWidth: 170, textAlign: 'left' }}>
+                <Button onClick={show}>
+                  <MenuFoldOutlined /> {query.chapter}
+                </Button>
+              </div>
             );
           }}
           footer={false}
@@ -71,12 +75,12 @@ export function BasicLayout({ children, chapters }: Props) {
             headerStyle: { backgroundColor: '#26282c' },
             drawerStyle: { backgroundColor: '#26282c', color: '#fff' },
           }}
-          content={() => {
+          content={({ hide }) => {
             return (
               <ul style={{ listStyle: 'none', padding: 0 }}>
                 {chapters?.map((chapter, i) => {
                   return (
-                    <li key={i}>
+                    <li key={i} onClick={hide}>
                       <Link
                         href="/[kind]/[course]/[chapter]"
                         as={`/${query.kind}/${query.course}/${chapter}`}
@@ -101,10 +105,38 @@ export function BasicLayout({ children, chapters }: Props) {
             width: 380,
           }}
         >
-          <Button ghost>Back</Button>
-          <span>6 / 15</span>
-          <Button type="text" style={{ backgroundColor: '#FFD500' }}>
-            Next
+          <Button
+            disabled={chapters?.indexOf(query?.chapter as string) < 1}
+            onClick={() => {
+              router.push(
+                '/[kind]/[course]/[chapter]',
+                `/${query.kind}/${query.course}/${
+                  chapters[chapters?.indexOf(query?.chapter as string) - 1]
+                }`
+              );
+            }}
+          >
+            Back
+          </Button>
+          <span>
+            {chapters?.indexOf(query?.chapter as string) + 1} / {chapters?.length}
+          </span>
+          <Button
+            disabled={chapters?.indexOf(query?.chapter as string) >= chapters?.length - 1}
+            onClick={() => {
+              router.push(
+                '/[kind]/[course]/[chapter]',
+                `/${query.kind}/${query.course}/${
+                  chapters[chapters?.indexOf(query?.chapter as string) + 1]
+                }`
+              );
+            }}
+            type="text"
+            style={{ backgroundColor: '#FFD500' }}
+          >
+            {chapters?.indexOf(query?.chapter as string) >= chapters?.length - 1
+              ? 'End course'
+              : 'Next'}
           </Button>
         </div>
         <div>

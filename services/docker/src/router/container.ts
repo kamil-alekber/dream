@@ -3,28 +3,19 @@ import { CustomResponse } from '../helpers/customResponse';
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
+import { ENV } from '../helpers/env';
 
 const ContainerRoutes = Router();
+console.log('folder:');
 
 ContainerRoutes.route('/run').post(async (req, res) => {
-  const code = req.body.code;
-  const kind = req.body.kind;
-  const course = req.body.course;
-  const chapter = req.body.chapter;
+  const { code, kind, course, chapter } = req.body;
 
   if (!code || !kind || !course || !chapter) CustomResponse.badRequest(res);
   // TODO: pick up user from the session or token ???
-  const coursePath = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}`;
+  const coursePath = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const isExist = fs.existsSync(coursePath);
   if (!isExist) CustomResponse.badRequest(res, 'Course does not exist');
-
-  const userCoursePath = `${coursePath}/users-input/${req.user}`;
-
-  if (!fs.existsSync(userCoursePath)) {
-    fs.mkdirSync(userCoursePath);
-  }
-
-  fs.writeFileSync(path.resolve(userCoursePath, 'index.js'), code);
 
   // exec() and spawn()
   // 1. create image if there is not
@@ -40,7 +31,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     const existingImg = stdout.includes(imageName);
     if (!existingImg) {
       exec(
-        `docker build -t ${imageName} ${process.cwd()}/artifacts/${kind}/${course}`,
+        `docker build -t ${imageName} ${ENV.ARTIFACTS}/${kind}/${course}`,
         (err, stdout, stderr) => {
           if (err) {
             console.log(`error: ${err.message}`);
@@ -58,11 +49,24 @@ ContainerRoutes.route('/run').post(async (req, res) => {
 
   // 2. Run the container
   const name = `${imageName}-${req.user}`;
-  const mountVolume = `${process.cwd()}/artifacts/${kind}/${course}/${chapter}:/usr/src/app`;
-  // TODO: change the main file
+  const mountVolume = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}:/usr/src/app`;
+  // TODO: only runs index js with the node
   const cmd = `node users-input/${req.user}/index.js`;
   // const cmd = 'ls -lha';
-  // check if the image is bing build, else it will throw the error
+
+  // TODO: check if the image is bing build, else it will throw the error
+
+  // Create the user specific folder and load the files in
+  const userCoursePath = `${coursePath}/${chapter}/users-input/${req.user}`;
+  if (!fs.existsSync(userCoursePath)) {
+    fs.mkdirSync(userCoursePath, { recursive: true });
+  }
+
+  fs.writeFileSync(
+    path.resolve(userCoursePath, fs.readdirSync(userCoursePath)?.[0] || 'default.' + kind),
+    code
+  );
+
   exec(
     `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
     (err, stdout, stderr) => {

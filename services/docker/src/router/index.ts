@@ -1,29 +1,28 @@
-import { O_SYMLINK } from 'constants';
 import { Router } from 'express';
-import path from 'path';
 import { CustomResponse } from '../helpers/customResponse';
 import { ContainerRoutes } from './container';
-import { statSync, readdirSync, fstat, readFileSync } from 'fs';
+import fs from 'fs';
+import { ENV } from '../helpers/env';
+
 const appRoutes = Router();
 
 appRoutes.get('/', (req, res) => {
-  const artifactsFolder = `${process.cwd()}/artifacts`;
-  const kindList = readdirSync(artifactsFolder);
+  const kindList = fs.readdirSync(ENV.ARTIFACTS);
 
   const artifacts = {};
 
   for (const kind of kindList) {
-    const kindFolder = `${artifactsFolder}/${kind}`;
-    const courseList = readdirSync(kindFolder);
+    const kindFolder = `${ENV.ARTIFACTS}/${kind}`;
+    const courseList = fs.readdirSync(kindFolder);
 
     for (const course of courseList) {
-      const courseFolder = `${artifactsFolder}/${kind}/${course}`;
-      if (statSync(courseFolder).isFile()) continue;
+      const courseFolder = `${ENV.ARTIFACTS}/${kind}/${course}`;
+      if (fs.statSync(courseFolder).isFile()) continue;
 
-      let chapterList = readdirSync(courseFolder);
+      let chapterList = fs.readdirSync(courseFolder);
 
       chapterList = chapterList.filter((chapter) => {
-        return !statSync(`${courseFolder}/${chapter}`).isFile();
+        return !fs.statSync(`${courseFolder}/${chapter}`).isFile();
       });
 
       if (artifacts[kind]?.length > 0) {
@@ -40,16 +39,45 @@ appRoutes.get('/', (req, res) => {
 appRoutes.get('/artifacts', (req, res) => {
   const { kind, course, chapter } = req.query;
   if (chapter === 'worker-javascript.js') return CustomResponse.ok(res);
-  const courseFolder = `${process.cwd()}/artifacts/${kind}/${course}`;
-  const docFolder = `${courseFolder}/${chapter}/docs/learn.md`;
+  const courseFolder = `${ENV.ARTIFACTS}/${kind}/${course}`;
+  const docFolder = `${courseFolder}/${chapter}/docs`;
 
-  const chapters = readdirSync(courseFolder).filter((chapter) => {
-    return !statSync(`${courseFolder}/${chapter}`).isFile();
+  if (!fs.existsSync(docFolder)) {
+    fs.mkdirSync(docFolder, { recursive: true });
+    const str = `\nArtifact \"learn\" in docs for the course \"${course}\" in chapter \"${chapter}\" is not present. Generating default one.\n`;
+    // write default file if it does not exist
+    fs.writeFileSync(docFolder + '/learn.md', str);
+    console.warn(str);
+  }
+
+  const doc = fs.readFileSync(docFolder + '/learn.md', 'utf8');
+
+  const userFolder = `${courseFolder}/${chapter}/users-input/${req.user}`;
+  if (!fs.existsSync(userFolder)) {
+    fs.mkdirSync(userFolder, { recursive: true });
+
+    // copy files recursively from entry folder to a user
+    const entryFolder = `${courseFolder}/${chapter}/entry`;
+    // write default file if it does not exist
+    if (!fs.existsSync(entryFolder)) {
+      fs.mkdirSync(entryFolder, { recursive: true });
+      const str = `\nArtifact \"default file\" in entry folder for the course \"${course}\" in chapter \"${chapter}\" is not present. Generating default one.\n`;
+      // write default file if it does not exist
+      fs.writeFileSync(entryFolder + '/index.' + kind, str);
+      console.warn(str);
+    }
+
+    const entryFolderContent = fs.readdirSync(entryFolder);
+    entryFolderContent.forEach((file) => {
+      fs.copyFileSync(`${entryFolder}/${file}`, `${userFolder}/${file}`);
+    });
+  }
+  // TODO: currently only reads first file
+  const code = fs.readFileSync(`${userFolder}/${fs.readdirSync(userFolder)[0]}`, 'utf8');
+  const chapters = fs.readdirSync(courseFolder).filter((chap) => {
+    return !fs.statSync(`${courseFolder}/${chap}`).isFile();
   });
-
-  const doc = readFileSync(docFolder, 'utf8');
-  // const
-  return CustomResponse.ok(res, '', { doc, chapters });
+  return CustomResponse.ok(res, '', { code, doc, chapters });
 });
 
 appRoutes.use('/c', ContainerRoutes);

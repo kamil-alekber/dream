@@ -15,6 +15,7 @@ interface Props {
     data?: {
       chapters: string[];
       doc: Doc;
+      code: string;
     };
     error: boolean;
     message: string;
@@ -22,9 +23,11 @@ interface Props {
 }
 
 function Index(props: Props) {
+  console.log(props.initialProps.data.doc);
+
   return (
-    <BasicLayout chapters={props.initialProps.data.chapters}>
-      <Courses doc={props.initialProps.data.doc} />
+    <BasicLayout chapters={props?.initialProps?.data?.chapters}>
+      <Courses code={props?.initialProps?.data?.code} doc={props?.initialProps?.data?.doc} />
     </BasicLayout>
   );
 }
@@ -49,7 +52,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const parsedData = await res.json();
   if (parsedData?.data) {
-    const mattered = matter(parsedData.data.doc, { excerpt: true });
+    console.log(parsedData?.data);
+    const mattered = matter(parsedData?.data?.doc, { excerpt: true });
     parsedData.data.doc = mattered;
   }
 

@@ -1,8 +1,2 @@
-console.log('hello world');
 
-let count = 0;
-
-setInterval(() => {
-  console.log('interval entry', count);
-  count += 1;
-}, 2000);
+Artifact "default file" in entry folder for the course "authentication_in_js" in chapter "1_setup" is not present. Generating default one.

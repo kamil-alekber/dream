@@ -34,23 +34,25 @@ function Index({ initialProps }: Props) {
   return (
     <div>
       <Card title="Courses">
-        {courses.map((item, i) => {
-          return (
-            <Link
-              key={i}
-              href="/[kind]/[course]/[chapter]"
-              as={`/${item.kind}/${item.course}/${item.chapters[0]}`}
-            >
-              <a>
-                <Card.Grid style={gridStyle}>
-                  <h3>{item.course}</h3>
-                  <p>{item?.description}</p>
-                  {TagPicker({ text: item.kind })}
-                </Card.Grid>
-              </a>
-            </Link>
-          );
-        })}
+        {courses
+          .filter((item) => item.chapters[0])
+          .map((item, i) => {
+            return (
+              <Link
+                key={i}
+                href="/[kind]/[course]/[chapter]"
+                as={`/${item.kind}/${item.course}/${item.chapters[0]}`}
+              >
+                <a>
+                  <Card.Grid style={gridStyle}>
+                    <h3>{item?.course}</h3>
+                    <p>{item?.description}</p>
+                    {TagPicker({ text: item.kind })}
+                  </Card.Grid>
+                </a>
+              </Link>
+            );
+          })}
       </Card>
     </div>
   );

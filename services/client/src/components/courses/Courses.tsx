@@ -4,7 +4,7 @@ import { Editor } from '../EditorBrowser';
 import { useEffect, useRef, useState } from 'react';
 import { Doc } from '../../pages/[kind]/[course]/[chapter]';
 
-export function Courses({ doc }: { doc: Doc }) {
+export function Courses({ doc, code }: { doc?: Doc; code: string }) {
   const [codeResult, setCodeResult] = useState('');
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -17,7 +17,8 @@ export function Courses({ doc }: { doc: Doc }) {
 
   return (
     <Row style={{ height: '100%' }}>
-      <Col className="learn" xs={1} sm={1} md={8} lg={8} xl={8}>
+      {/* 24 slices */}
+      <Col className="learn" xs={8} sm={8} md={8} lg={8} xl={8}>
         <div className="top-panel">
           <h3>
             <ReadOutlined /> Learn
@@ -25,13 +26,15 @@ export function Courses({ doc }: { doc: Doc }) {
         </div>
         <div className="instruction">
           <h2>{doc?.data?.title}</h2>
-          <div dangerouslySetInnerHTML={{ __html: doc?.content.split('---')[1] }}></div>
+          <div
+            dangerouslySetInnerHTML={{ __html: doc?.content?.split('---')[1] || doc?.content }}
+          ></div>
         </div>
       </Col>
-      <Col className="code" xs={1} sm={1} md={8} lg={8} xl={8}>
-        <Editor setCodeResult={setCodeResult} />
+      <Col className="code" xs={8} sm={8} md={8} lg={8} xl={8}>
+        <Editor defaultCode={code} setCodeResult={setCodeResult} />
       </Col>
-      <Col className="display" xs={1} sm={1} md={8} lg={8} xl={8}>
+      <Col className="display" xs={8} sm={8} md={8} lg={8} xl={8}>
         <div className="search-panel">
           <Button>
             <LeftOutlined />

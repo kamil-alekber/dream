@@ -1,5 +1,5 @@
 ---
-title: Intro to the variables
+title: Set timeout utility function
 ---
 
 JavaScript is the best language to learn. You shoold start your carrier now.
