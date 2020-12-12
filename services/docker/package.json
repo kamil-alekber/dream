@@ -9,15 +9,14 @@
     "dev-log": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src/ >node.access.log 2>error-file.txt",
     "dev": "ts-node-dev --rs --files --project ./tsconfig.json --notify --watch .env.dev ./src",
     "tsc": "tsc --build tsconfig.build.json",
-    "build": "npm run tsc",
-    "start": "rm -rf build && npm run build && NODE_ENV=prod node build"
+    "build": "rm -rf build && npm run tsc",
+    "start": "NODE_ENV=prod node build"
   },
   "dependencies": {
     "@typegoose/typegoose": "7.4.2",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "formidable": "1.2.2",
     "jsonwebtoken": "8.5.1",
     "mongoose": "5.10.15",
     "uuid": "8.3.1"
@@ -25,7 +24,6 @@
   "devDependencies": {
     "@types/cors": "2.8.8",
     "@types/express": "4.17.9",
-    "@types/formidable": "1.0.31",
     "@types/jsonwebtoken": "8.5.0",
     "@types/mongoose": "5.10.1",
     "@types/node": "14.14.9",

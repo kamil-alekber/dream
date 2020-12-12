@@ -63,13 +63,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     return;
   }
 
-  // TODO: check if the image is bing build, else it will throw the error
-
-  // Create the user specific folder and load the files in
   const userCoursePath = `${coursePath}/${chapter}/users-input/${req.user}`;
-  if (!fs.existsSync(userCoursePath)) {
-    fs.mkdirSync(userCoursePath, { recursive: true });
-  }
 
   fs.writeFileSync(
     path.resolve(userCoursePath, fs.readdirSync(userCoursePath)?.[0] || 'default.' + kind),
@@ -108,6 +102,22 @@ ContainerRoutes.route('/run').post(async (req, res) => {
       }
     }
   );
+});
+
+ContainerRoutes.route('/run/local').post(async (req, res) => {
+  const { code, kind, course, chapter } = req.body;
+  if (!code || !kind || !course || !chapter) CustomResponse.badRequest(res);
+
+  const coursePath = `${ENV.ARTIFACTS}/${kind}/${course}`;
+  const userCoursePath = `${coursePath}/${chapter}/users-input/${req.user}`;
+
+  fs.writeFileSync(
+    path.resolve(userCoursePath, fs.readdirSync(userCoursePath)?.[0] || 'default.' + kind),
+    code
+  );
+
+  res.status(200).write(code);
+  res.end();
 });
 
 export { ContainerRoutes };

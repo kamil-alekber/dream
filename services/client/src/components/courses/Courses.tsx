@@ -3,8 +3,11 @@ import { LeftOutlined, ReloadOutlined, ReadOutlined } from '@ant-design/icons';
 import { Editor } from '../EditorBrowser';
 import { useEffect, useRef, useState } from 'react';
 import { Doc } from '../../pages/[kind]/[course]/[chapter]';
+import { useRouter } from 'next/router';
 
 export function Courses({ doc, code }: { doc?: Doc; code: string }) {
+  const router = useRouter();
+  const query = router.query as Record<string, string>;
   const [codeResult, setCodeResult] = useState('');
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,7 +55,11 @@ export function Courses({ doc, code }: { doc?: Doc; code: string }) {
           />
         </div>
         <div className="code-result">
-          <pre>{codeResult}</pre>
+          {['css', 'html'].indexOf(query.kind) >= 0 ? (
+            <div dangerouslySetInnerHTML={{ __html: codeResult }}></div>
+          ) : (
+            <pre>{codeResult}</pre>
+          )}
           <div ref={scrollRef}></div>
         </div>
       </Col>

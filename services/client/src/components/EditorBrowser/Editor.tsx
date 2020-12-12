@@ -11,7 +11,13 @@ import { Button, Tree, Dropdown, Modal, Spin, notification } from 'antd';
 import { useRouter } from 'next/router';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/mode-python';
+import 'ace-builds/src-noconflict/mode-css';
+import 'ace-builds/src-noconflict/mode-html';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
+import 'ace-builds/src-noconflict/ext-language_tools';
+import 'ace-builds/src-noconflict/ext-emmet';
+import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite';
+
 import { parseQueryToURL } from '../../helpers';
 
 const { DirectoryTree } = Tree;
@@ -69,14 +75,19 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
   const [selectedItem, setSelectedItem] = useState('');
   const [fileTreeOpen, setFileTreeOpen] = useState(false);
   const router = useRouter();
-  const { query } = router;
+  const query = router.query as Record<string, string>;
 
   useEffect(() => {
     setCode(defaultCode);
   }, [query.chapter, refreshToDefault]);
 
   async function runCodeHandler() {
-    const res = await fetch('http://localhost:5000/c/run', {
+    const url =
+      ['css', 'html'].indexOf(query.kind) >= 0
+        ? 'http://localhost:5000/c/run/local'
+        : 'http://localhost:5000/c/run';
+
+    const res = await fetch(url, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -125,6 +136,8 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
   const mode = {
     js: 'javascript',
     py: 'python',
+    css: 'css',
+    html: 'html',
   };
 
   return (
@@ -143,9 +156,17 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
         </div>
       </Dropdown>
       <AceEditor
+        setOptions={{
+          useElasticTabstops: true,
+          enableBasicAutocompletion: true,
+          enableLiveAutocompletion: true,
+          enableEmmet: true,
+          enableSnippets: true,
+        }}
+        wrapEnabled
         value={code}
         onChange={(value) => setCode(value)}
-        mode={mode[`${query?.kind}`]}
+        mode={mode[query?.kind]}
         theme="tomorrow_night"
         // CSS id
         name="editor"
@@ -156,10 +177,11 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
           onClick={async () => {
             setRunning(true);
             const res = await runCodeHandler();
-            if (res) {
+
+            setTimeout(() => {
               setCodeResult(res);
-            }
-            setRunning(false);
+              setRunning(false);
+            }, 1000);
           }}
           size="large"
           type="primary"
@@ -190,9 +212,8 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
               },
               okCancel: true,
               centered: true,
-              title: 'Refresh the content to the base file',
-              content:
-                'Are you sure to refresh the content to the base file. Your progress for the current chapter will be undone',
+              title: 'Reset Workspace',
+              content: 'Are you sure you want to restart? All of your code will be erased',
             });
           }}
         >
