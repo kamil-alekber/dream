@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { Courses } from '../../../components/courses/Courses';
-import { cookieParser } from '../../../helpers';
+import { cookieParser, parseQueryToURL } from '../../../helpers';
 import { CoursesLayout } from '../../../components/CoursesLayout';
 import matter from 'gray-matter';
 
@@ -37,13 +37,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
   const cookies = cookieParser(context?.req?.headers || {});
-  let url = `http://localhost:5000/artifacts`;
 
-  Object.keys(context.query).forEach((key, i) => {
-    url += `${i === 0 ? '?' : '&'}${key}=${context.query[key]}`;
-  });
-
-  const res = await fetch(url, {
+  const res = await fetch(parseQueryToURL('http://localhost:5000/artifacts', context.query), {
     credentials: 'include',
     method: 'GET',
     headers: {

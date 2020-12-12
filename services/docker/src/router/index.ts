@@ -38,12 +38,14 @@ appRoutes.get('/', (req, res) => {
 
 appRoutes.get('/artifacts', (req, res) => {
   const { kind, course, chapter } = req.query;
+  if (!kind || !course || !chapter) CustomResponse.badRequest(res);
+
   const courseFolder = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const docFolder = `${courseFolder}/${chapter}/docs`;
 
   if (!fs.existsSync(docFolder)) {
     fs.mkdirSync(docFolder, { recursive: true });
-    const str = `\nArtifact \"learn\" in docs for the course \"${course}\" in chapter \"${chapter}\" is not present. Generating default one.\n`;
+    const str = `Artifact \"learn\" in docs for the course \"${course}\" in chapter \"${chapter}\" is not present. Generating default one.\n`;
     // write default file if it does not exist
     fs.writeFileSync(docFolder + '/learn.md', str);
     console.warn(str);
@@ -60,7 +62,7 @@ appRoutes.get('/artifacts', (req, res) => {
     // write default file if it does not exist
     if (!fs.existsSync(entryFolder)) {
       fs.mkdirSync(entryFolder, { recursive: true });
-      const str = `\nArtifact \"default file\" in entry folder for the course \"${course}\" in chapter \"${chapter}\" is not present. Generating default one.\n`;
+      const str = `Artifact \"default file\" in entry folder for \nthe course \"${course}\" \nin chapter \"${chapter}\" is not present. \nGenerating default one.\n`;
       // write default file if it does not exist
       fs.writeFileSync(entryFolder + '/index.' + kind, str);
       console.warn(str);
@@ -77,6 +79,18 @@ appRoutes.get('/artifacts', (req, res) => {
     return !fs.statSync(`${courseFolder}/${chap}`).isFile();
   });
   return CustomResponse.ok(res, '', { code, doc, chapters });
+});
+
+appRoutes.use('/default', async (req, res) => {
+  const { kind, course, chapter } = req.query;
+  if (!kind || !course || !chapter) CustomResponse.badRequest(res);
+
+  const srcFolder = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}/entry`;
+  const destFolder = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}/users-input/${req.user}/${
+    fs.readdirSync(srcFolder)[0]
+  }`;
+  fs.copyFileSync(`${srcFolder}/${fs.readdirSync(srcFolder)[0]}`, destFolder);
+  CustomResponse.ok(res);
 });
 
 appRoutes.use('/c', ContainerRoutes);
