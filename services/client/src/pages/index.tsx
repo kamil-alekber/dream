@@ -3,6 +3,7 @@ import { Card } from 'antd';
 import { GetServerSideProps } from 'next';
 import { TagPicker } from '../components/TagPicker';
 import { cookieParser } from '../helpers';
+import { BasicLayout } from '../components/BasicLayout';
 
 interface Props {
   initialProps?: {
@@ -32,7 +33,7 @@ function Index({ initialProps }: Props) {
   };
 
   return (
-    <div>
+    <BasicLayout>
       <Card title="Courses">
         {courses
           .filter((item) => item.chapters[0])
@@ -54,7 +55,7 @@ function Index({ initialProps }: Props) {
             );
           })}
       </Card>
-    </div>
+    </BasicLayout>
   );
 }
 

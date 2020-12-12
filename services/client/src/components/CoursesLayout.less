@@ -1,0 +1,80 @@
+.BasicLayout {
+  overflow: hidden;
+  height: 100vh;
+
+  .header {
+    color: #fff;
+    background-color: #26282c;
+    display: flex;
+    justify-content: space-between;
+
+    .action {
+      cursor: pointer;
+    }
+  }
+
+  .content {
+    height: 100%;
+    .learn {
+      .top-panel {
+        padding: 5px 10px;
+        h3 {
+          margin-bottom: 5px;
+        }
+      }
+
+      .instruction {
+        box-shadow: inset 0 0 10px #000000;
+        height: 80vh;
+        overflow: scroll;
+        padding: 5px 10px;
+        background-color: #fff;
+      }
+    }
+
+    .code {
+      background-color: #1c2022;
+      color: #fff;
+      display: flex;
+      justify-content: space-evenly;
+      flex-direction: column;
+      .window-panel {
+        padding: 5px 10px 0 10px;
+
+        h3 {
+          color: inherit;
+          font-weight: lighter;
+        }
+      }
+
+      #editor {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .action-panel {
+        background-color: #26282c;
+      }
+    }
+
+    .display {
+      .search-panel {
+        display: flex;
+      }
+
+      .code-result {
+        overflow: scroll;
+        padding: 10px 0 0 10px;
+        height: 80vh;
+      }
+    }
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    background-color: #26282c;
+  }
+}

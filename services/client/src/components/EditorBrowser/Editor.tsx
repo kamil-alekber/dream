@@ -73,6 +73,11 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
     </div>
   );
 
+  const mode = {
+    js: 'javascript',
+    py: 'python',
+  };
+
   return (
     <React.Fragment>
       <Dropdown
@@ -91,7 +96,7 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
       <AceEditor
         value={code}
         onChange={(value) => setCode(value)}
-        mode="python"
+        mode={mode[`${query?.kind}`]}
         theme="tomorrow_night"
         // CSS id
         name="editor"

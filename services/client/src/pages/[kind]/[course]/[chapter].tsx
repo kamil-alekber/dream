@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { Courses } from '../../../components/courses/Courses';
 import { cookieParser } from '../../../helpers';
-import { BasicLayout } from '../../../components/BasicLayout';
+import { CoursesLayout } from '../../../components/CoursesLayout';
 import matter from 'gray-matter';
 
 export interface Doc {
@@ -24,9 +24,9 @@ interface Props {
 
 function Index(props: Props) {
   return (
-    <BasicLayout chapters={props?.initialProps?.data?.chapters}>
+    <CoursesLayout chapters={props?.initialProps?.data?.chapters}>
       <Courses code={props?.initialProps?.data?.code} doc={props?.initialProps?.data?.doc} />
-    </BasicLayout>
+    </CoursesLayout>
   );
 }
 
