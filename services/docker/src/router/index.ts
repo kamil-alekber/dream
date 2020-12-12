@@ -38,7 +38,6 @@ appRoutes.get('/', (req, res) => {
 
 appRoutes.get('/artifacts', (req, res) => {
   const { kind, course, chapter } = req.query;
-  if (chapter === 'worker-javascript.js') return CustomResponse.ok(res);
   const courseFolder = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const docFolder = `${courseFolder}/${chapter}/docs`;
 

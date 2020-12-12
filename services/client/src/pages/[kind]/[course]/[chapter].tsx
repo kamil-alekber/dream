@@ -23,8 +23,6 @@ interface Props {
 }
 
 function Index(props: Props) {
-  console.log(props.initialProps.data.doc);
-
   return (
     <BasicLayout chapters={props?.initialProps?.data?.chapters}>
       <Courses code={props?.initialProps?.data?.code} doc={props?.initialProps?.data?.doc} />
@@ -33,6 +31,11 @@ function Index(props: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (context.query.chapter === 'worker-javascript.js') {
+    return {
+      props: { initialProps: null }, // will be passed to the page component as props
+    };
+  }
   const cookies = cookieParser(context?.req?.headers || {});
   let url = `http://localhost:5000/artifacts`;
 
@@ -52,7 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const parsedData = await res.json();
   if (parsedData?.data) {
-    console.log(parsedData?.data);
     const mattered = matter(parsedData?.data?.doc, { excerpt: true });
     parsedData.data.doc = mattered;
   }

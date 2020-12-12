@@ -4,6 +4,7 @@ import { SyncOutlined, CopyOutlined, FolderOutlined, FolderOpenOutlined } from '
 import { Button, Tree, Dropdown } from 'antd';
 import { useRouter } from 'next/router';
 import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-python';
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
 const { DirectoryTree } = Tree;
@@ -13,13 +14,17 @@ interface Props {
 }
 
 export default function Editor({ setCodeResult, defaultCode }: Props) {
-  const [code, setCode] = useState(defaultCode || '');
+  const [code, setCode] = useState(defaultCode);
   const [running, setRunning] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState('');
   const [fileTreeOpen, setFileTreeOpen] = useState(false);
 
   const { query } = useRouter();
+
+  useEffect(() => {
+    setCode(defaultCode);
+  }, [query.chapter]);
 
   async function runCodeHandler() {
     const res = await fetch('http://localhost:5000/c/run', {
@@ -86,7 +91,7 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
       <AceEditor
         value={code}
         onChange={(value) => setCode(value)}
-        mode="javascript"
+        mode="python"
         theme="tomorrow_night"
         // CSS id
         name="editor"

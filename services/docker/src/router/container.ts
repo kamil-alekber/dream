@@ -24,24 +24,23 @@ ContainerRoutes.route('/run').post(async (req, res) => {
 
   await new Promise((resolve, reject) => {
     exec(`docker image ls -f reference=${imageName}`, (err, stdout, stderr) => {
-      if (err) {
-        console.log(`error: ${err.message}`);
-      }
       if (stderr) {
-        console.log(`stderr: ${stderr}`);
+        console.log(`Reference stderr: ${stderr}`);
+      } else if (err) {
+        console.log(`Reference error: ${err.message}`);
       }
 
       const existingImg = stdout.includes(imageName);
 
       if (!existingImg) {
         exec(
-          `docker build -t ${imageName} ${ENV.ARTIFACTS}/${kind}/${course}`,
+          `docker build --quiet --tag ${imageName} ${ENV.ARTIFACTS}/${kind}/${course}`,
           (err, stdout, stderr) => {
-            if (err) {
-              error = `[ERROR] Building Image: ${err.message}`;
-              reject(error);
-            } else if (!stderr.includes('DONE')) {
+            if (stderr) {
               error = `[STDERR] Building Image: ${stderr}`;
+              reject(error);
+            } else if (err) {
+              error = `[ERROR] Building Image: ${err.message}`;
               reject(error);
             } else {
               const result = `[STDOUT] Building Image: ${stdout}`;
@@ -63,12 +62,6 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     res.end();
     return;
   }
-  // 2. Run the container
-  const name = `${imageName}-${req.user}`;
-  const mountVolume = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}:/usr/src/app`;
-  // TODO: only runs index js with the node
-  const cmd = `node users-input/${req.user}/index.js`;
-  // const cmd = 'ls -lha';
 
   // TODO: check if the image is bing build, else it will throw the error
 
@@ -83,15 +76,26 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     code
   );
 
+  // 2. Run the container
+  const name = `${imageName}-${req.user}`;
+  // read only mountVolume :ro
+  const mountVolume = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}:/usr/src/app:ro`;
+  const cmd = {
+    js: `node users-input/${req.user}/index.js`,
+    py: `python3 users-input/${req.user}/index.py`,
+    debug: 'ls -lha',
+  };
+
   exec(
-    `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
+    `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd[kind] || cmd.debug}`,
     (err, stdout, stderr) => {
-      if (err) {
-        error = `[ERROR] Running container: ${err.message}`;
-      } else if (stderr) {
-        error = `[STDERR] Running container: ${stderr}`;
+      // TODO: change error that is exposed to the client
+      if (stderr) {
+        error = `[ERROR] Running code: ${stderr}`;
+      } else if (err) {
+        error = `[ERROR] Running code: ${err.message}`;
       } else {
-        console.log('[STDOUT] Running Docker Container:', name);
+        console.log('[STDOUT] Running code:', name);
         res.status(200).write(stdout);
         res.end();
       }
@@ -101,7 +105,6 @@ ContainerRoutes.route('/run').post(async (req, res) => {
         console.error(error);
         res.status(500).send(error);
         res.end();
-        return;
       }
     }
   );
