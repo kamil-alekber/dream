@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CustomResponse } from '../helpers/customResponse';
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { ENV } from '../helpers/env';
 
 const ContainerRoutes = Router();
@@ -20,33 +20,49 @@ ContainerRoutes.route('/run').post(async (req, res) => {
   // exec() and spawn()
   // 1. create image if there is not
   const imageName = `${kind}-${course}`;
-  exec(`docker image ls -f reference=${imageName}`, (err, stdout, stderr) => {
-    if (err) {
-      console.log(`error: ${err.message}`);
-    }
-    if (stderr) {
-      console.log(`stderr: ${stderr}`);
-    }
+  let error = '';
 
-    const existingImg = stdout.includes(imageName);
-    if (!existingImg) {
-      exec(
-        `docker build -t ${imageName} ${ENV.ARTIFACTS}/${kind}/${course}`,
-        (err, stdout, stderr) => {
-          if (err) {
-            console.log(`error: ${err.message}`);
-          }
-          if (stderr) {
-            console.log(`stderr: ${stderr}`);
-          }
-          console.log(`Building Image: ${stdout}`);
-        }
-      );
-    } else {
-      console.log(`Using Cached Img: ${imageName}`);
-    }
-  });
+  await new Promise((resolve, reject) => {
+    exec(`docker image ls -f reference=${imageName}`, (err, stdout, stderr) => {
+      if (err) {
+        console.log(`error: ${err.message}`);
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+      }
 
+      const existingImg = stdout.includes(imageName);
+
+      if (!existingImg) {
+        exec(
+          `docker build -t ${imageName} ${ENV.ARTIFACTS}/${kind}/${course}`,
+          (err, stdout, stderr) => {
+            if (err) {
+              error = `[ERROR] Building Image: ${err.message}`;
+              reject(error);
+            } else if (!stderr.includes('DONE')) {
+              error = `[STDERR] Building Image: ${stderr}`;
+              reject(error);
+            } else {
+              const result = `[STDOUT] Building Image: ${stdout}`;
+              resolve(result);
+            }
+          }
+        );
+      } else {
+        const result = `[Cached] Using Cached Img: ${imageName}`;
+        resolve(result);
+      }
+    });
+  })
+    .then(console.log)
+    .catch(console.error);
+
+  if (error) {
+    res.status(500).send(error);
+    res.end();
+    return;
+  }
   // 2. Run the container
   const name = `${imageName}-${req.user}`;
   const mountVolume = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}:/usr/src/app`;
@@ -71,13 +87,21 @@ ContainerRoutes.route('/run').post(async (req, res) => {
     `docker run --rm --name ${name} -v ${mountVolume} ${imageName} ${cmd}`,
     (err, stdout, stderr) => {
       if (err) {
-        console.log(`error: ${err.message}`);
+        error = `[ERROR] Running container: ${err.message}`;
       } else if (stderr) {
-        console.log(`stderr: ${stderr}`);
+        error = `[STDERR] Running container: ${stderr}`;
       } else {
-        console.log('Running Docker Container:', name);
+        console.log('[STDOUT] Running Docker Container:', name);
         res.status(200).write(stdout);
         res.end();
+      }
+
+      // TODO: Error from container might move from here in the future
+      if (error) {
+        console.error(error);
+        res.status(500).send(error);
+        res.end();
+        return;
       }
     }
   );
