@@ -15,7 +15,7 @@ interface Props {
     data?: {
       chapters: string[];
       doc: Doc;
-      code: string;
+      files: Record<string, string>;
     };
     error: boolean;
     message: string;
@@ -25,13 +25,13 @@ interface Props {
 function Index(props: Props) {
   return (
     <CoursesLayout chapters={props?.initialProps?.data?.chapters}>
-      <Courses code={props?.initialProps?.data?.code} doc={props?.initialProps?.data?.doc} />
+      <Courses {...props?.initialProps?.data} />
     </CoursesLayout>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context.query.chapter === 'worker-javascript.js') {
+  if (context.query.chapter.includes('worker')) {
     return {
       props: { initialProps: null }, // will be passed to the page component as props
     };

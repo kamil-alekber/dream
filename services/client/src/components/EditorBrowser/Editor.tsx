@@ -1,13 +1,7 @@
 import React, { useState, SetStateAction, useEffect } from 'react';
 import AceEditor from 'react-ace';
-import {
-  SyncOutlined,
-  CopyOutlined,
-  FolderOutlined,
-  FolderOpenOutlined,
-  FileDoneOutlined,
-} from '@ant-design/icons';
-import { Button, Tree, Dropdown, Modal, Spin, notification } from 'antd';
+import { SyncOutlined, CopyOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { Button, Modal, Spin, Tabs } from 'antd';
 import { useRouter } from 'next/router';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/mode-python';
@@ -20,13 +14,7 @@ import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite';
 
 import { parseQueryToURL } from '../../helpers';
 
-const { DirectoryTree } = Tree;
-interface Props {
-  setCodeResult: React.Dispatch<SetStateAction<string>>;
-  defaultCode: string;
-}
-
-function fallbackCopyTextToClipboard(text) {
+function fallbackCopyTextToClipboard(text: string) {
   const textArea = document.createElement('textarea');
   textArea.value = text;
 
@@ -50,7 +38,7 @@ function fallbackCopyTextToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
-async function copyTextToClipboard(text) {
+async function copyTextToClipboard(text: string) {
   if (!navigator.clipboard) {
     fallbackCopyTextToClipboard(text);
     return;
@@ -66,19 +54,25 @@ async function copyTextToClipboard(text) {
   );
 }
 
-export default function Editor({ setCodeResult, defaultCode }: Props) {
-  const [code, setCode] = useState(defaultCode);
+interface Props {
+  setCodeResult: React.Dispatch<SetStateAction<string>>;
+  files: Record<string, string>;
+}
+
+export default function Editor({ setCodeResult, files }: Props) {
   const [running, setRunning] = useState(false);
   const [refreshToDefault, setRefreshToDefault] = useState(false);
   const [copying, setCopying] = useState(false);
-
-  const [selectedItem, setSelectedItem] = useState('');
-  const [fileTreeOpen, setFileTreeOpen] = useState(false);
   const router = useRouter();
   const query = router.query as Record<string, string>;
+  const modeList = { js: 'javascript', py: 'python', css: 'css', html: 'html' };
+  const defaultMode = modeList[Object?.keys(files)?.[0]?.split?.('.')?.[1]] || query.kind;
+  const defaultFile = Object.keys(files)?.[0];
+  const [modeFile, setModeFile] = useState({ mode: defaultMode, file: defaultFile });
+  const [code, setCode] = useState(files[modeFile.file]);
 
   useEffect(() => {
-    setCode(defaultCode);
+    setCode(files[modeFile.file]);
   }, [query.chapter, refreshToDefault]);
 
   async function runCodeHandler() {
@@ -97,64 +91,22 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
     return res.text();
   }
 
-  const treeData = [
-    {
-      title: 'entry',
-      key: '0-0',
-      children: [
-        { title: 'index.js', key: '0-0-0', isLeaf: true },
-        { title: 'import.js', key: '0-0-1', isLeaf: true },
-      ],
-    },
-    {
-      title: 'user',
-      key: '0-1',
-      children: [
-        { title: 'index.js', key: '0-1-0', isLeaf: true },
-        { title: 'import.js', key: '0-1-1', isLeaf: true },
-      ],
-    },
-  ];
-
-  const actionMenu = (
-    <div className="file-tree">
-      <DirectoryTree
-        multiple
-        defaultExpandAll
-        onSelect={(keys, info) => {
-          console.log(info.node.title);
-          if (info.node.isLeaf) {
-            setFileTreeOpen(false);
-            setSelectedItem(`${info.node.title}`);
-          }
-        }}
-        treeData={treeData}
-      />
-    </div>
-  );
-
-  const mode = {
-    js: 'javascript',
-    py: 'python',
-    css: 'css',
-    html: 'html',
-  };
+  const { TabPane } = Tabs;
 
   return (
     <React.Fragment>
-      <Dropdown
-        overlayStyle={{ color: '#fff', minWidth: 180 }}
-        overlay={actionMenu}
-        trigger={['click']}
-        visible={fileTreeOpen}
+      <Tabs
+        tabBarStyle={{ color: '#fff', paddingLeft: 10, marginBottom: 5 }}
+        defaultActiveKey="0"
+        onChange={(key) => {
+          setCode(files[key]);
+          setModeFile({ file: key, mode: key.split('.')[1] });
+        }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button size="large" type="primary" onClick={() => setFileTreeOpen(!fileTreeOpen)}>
-            {fileTreeOpen ? <FolderOpenOutlined /> : <FolderOutlined />}
-          </Button>
-          <h4 style={{ color: '#fff', margin: '0 0 0 10px' }}>{selectedItem}</h4>
-        </div>
-      </Dropdown>
+        {Object.keys(files).map((fileName) => {
+          return <TabPane tab={fileName} key={fileName} />;
+        })}
+      </Tabs>
       <AceEditor
         setOptions={{
           useElasticTabstops: true,
@@ -165,8 +117,11 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
         }}
         wrapEnabled
         value={code}
-        onChange={(value) => setCode(value)}
-        mode={mode[query?.kind]}
+        onChange={(value) => {
+          setCode(value);
+          files[modeFile.file] = value;
+        }}
+        mode={modeFile.mode}
         theme="tomorrow_night"
         // CSS id
         name="editor"
@@ -226,17 +181,19 @@ export default function Editor({ setCodeResult, defaultCode }: Props) {
             if (copying) return;
             await copyTextToClipboard(code);
             setCopying(true);
-            notification.info({
-              onClose: () => {
-                setCopying(false);
-              },
-              message: 'Copied to clipboard',
-              placement: 'topRight',
-              duration: 2,
-            });
+
+            setTimeout(() => {
+              setCopying(false);
+            }, 3000);
           }}
         >
-          {copying ? <FileDoneOutlined /> : <CopyOutlined />}
+          {copying ? (
+            <React.Fragment>
+              <FileDoneOutlined /> Copied to clipboard
+            </React.Fragment>
+          ) : (
+            <CopyOutlined />
+          )}
         </Button>
       </div>
     </React.Fragment>

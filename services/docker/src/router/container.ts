@@ -11,7 +11,15 @@ console.log('folder:');
 ContainerRoutes.route('/run').post(async (req, res) => {
   const { code, kind, course, chapter } = req.body;
 
-  if (!code || !kind || !course || !chapter) CustomResponse.badRequest(res);
+  if (
+    !code ||
+    !kind ||
+    !course ||
+    !chapter ||
+    !fs.existsSync(`${ENV.ARTIFACTS}/${kind}/${course}/${chapter}`)
+  ) {
+    return CustomResponse.badRequest(res);
+  }
   // TODO: pick up user from the session or token ???
   const coursePath = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const isExist = fs.existsSync(coursePath);
@@ -65,6 +73,7 @@ ContainerRoutes.route('/run').post(async (req, res) => {
 
   const userCoursePath = `${coursePath}/${chapter}/users-input/${req.user}`;
 
+  // TODO: writes to only one file
   fs.writeFileSync(
     path.resolve(userCoursePath, fs.readdirSync(userCoursePath)?.[0] || 'default.' + kind),
     code
@@ -102,15 +111,27 @@ ContainerRoutes.route('/run').post(async (req, res) => {
       }
     }
   );
+  // FIX: might cause an error ???
+  return;
 });
 
 ContainerRoutes.route('/run/local').post(async (req, res) => {
   const { code, kind, course, chapter } = req.body;
-  if (!code || !kind || !course || !chapter) CustomResponse.badRequest(res);
+
+  if (
+    !code ||
+    !kind ||
+    !course ||
+    !chapter ||
+    !fs.existsSync(`${ENV.ARTIFACTS}/${kind}/${course}/${chapter}`)
+  ) {
+    return CustomResponse.badRequest(res);
+  }
 
   const coursePath = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const userCoursePath = `${coursePath}/${chapter}/users-input/${req.user}`;
 
+  // TODO: writes only to the first file
   fs.writeFileSync(
     path.resolve(userCoursePath, fs.readdirSync(userCoursePath)?.[0] || 'default.' + kind),
     code
@@ -118,6 +139,7 @@ ContainerRoutes.route('/run/local').post(async (req, res) => {
 
   res.status(200).write(code);
   res.end();
+  return;
 });
 
 export { ContainerRoutes };

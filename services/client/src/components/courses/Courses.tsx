@@ -5,7 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Doc } from '../../pages/[kind]/[course]/[chapter]';
 import { useRouter } from 'next/router';
 
-export function Courses({ doc, code }: { doc?: Doc; code: string }) {
+interface Props {
+  files: Record<string, string>;
+  doc?: Doc;
+}
+
+export function Courses({ doc, files }: Props) {
   const router = useRouter();
   const query = router.query as Record<string, string>;
   const [codeResult, setCodeResult] = useState('');
@@ -35,7 +40,7 @@ export function Courses({ doc, code }: { doc?: Doc; code: string }) {
         </div>
       </Col>
       <Col className="code" xs={8} sm={8} md={8} lg={8} xl={8}>
-        <Editor defaultCode={code} setCodeResult={setCodeResult} />
+        <Editor files={files} setCodeResult={setCodeResult} />
       </Col>
       <Col className="display" xs={8} sm={8} md={8} lg={8} xl={8}>
         <div className="search-panel">

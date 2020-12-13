@@ -38,7 +38,16 @@ appRoutes.get('/', (req, res) => {
 
 appRoutes.get('/artifacts', (req, res) => {
   const { kind, course, chapter } = req.query;
-  if (!kind || !course || !chapter) CustomResponse.badRequest(res);
+
+  // Don't generate folder if the kind, course or chapter is not present
+  if (
+    !kind ||
+    !course ||
+    !chapter ||
+    !fs.existsSync(`${ENV.ARTIFACTS}/${kind}/${course}/${chapter}`)
+  ) {
+    return CustomResponse.badRequest(res);
+  }
 
   const courseFolder = `${ENV.ARTIFACTS}/${kind}/${course}`;
   const docFolder = `${courseFolder}/${chapter}/docs`;
@@ -64,7 +73,7 @@ appRoutes.get('/artifacts', (req, res) => {
       fs.mkdirSync(entryFolder, { recursive: true });
       const str = `Artifact \"default file\" in entry folder for \nthe course \"${course}\" \nin chapter \"${chapter}\" is not present. \nGenerating default one.\n`;
       // write default file if it does not exist
-      fs.writeFileSync(entryFolder + '/index.' + kind, str);
+      fs.writeFileSync(entryFolder + '/main.' + kind, str);
       console.warn(str);
     }
 
@@ -74,23 +83,39 @@ appRoutes.get('/artifacts', (req, res) => {
     });
   }
   // TODO: currently only reads first file
-  const code = fs.readFileSync(`${userFolder}/${fs.readdirSync(userFolder)[0]}`, 'utf8');
   const chapters = fs.readdirSync(courseFolder).filter((chap) => {
     return !fs.statSync(`${courseFolder}/${chap}`).isFile();
   });
-  return CustomResponse.ok(res, '', { code, doc, chapters });
+
+  const files = {};
+  const chapterFiles = fs.readdirSync(userFolder);
+  chapterFiles.forEach((fileName) => {
+    const content = fs.readFileSync(`${userFolder}/${fileName}`, 'utf8');
+    files[fileName] = content;
+  });
+
+  return CustomResponse.ok(res, '', { doc, chapters, files });
 });
 
 appRoutes.use('/default', async (req, res) => {
   const { kind, course, chapter } = req.query;
-  if (!kind || !course || !chapter) CustomResponse.badRequest(res);
+  if (
+    !kind ||
+    !course ||
+    !chapter ||
+    !fs.existsSync(`${ENV.ARTIFACTS}/${kind}/${course}/${chapter}`)
+  ) {
+    return CustomResponse.badRequest(res);
+  }
 
   const srcFolder = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}/entry`;
-  const destFolder = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}/users-input/${req.user}/${
-    fs.readdirSync(srcFolder)[0]
-  }`;
-  fs.copyFileSync(`${srcFolder}/${fs.readdirSync(srcFolder)[0]}`, destFolder);
-  CustomResponse.ok(res);
+  const destFolder = `${ENV.ARTIFACTS}/${kind}/${course}/${chapter}/users-input/${req.user}`;
+
+  fs.readdirSync(srcFolder).forEach((file) => {
+    fs.copyFileSync(`${srcFolder}/${file}`, `${destFolder}/${file}`);
+  });
+
+  return CustomResponse.ok(res);
 });
 
 appRoutes.use('/c', ContainerRoutes);
